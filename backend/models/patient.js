@@ -9,10 +9,23 @@ module.exports = (sequelize, DataTypes) => {
   }
 
   Patient.init({
-    name: DataTypes.STRING
+    fullName: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false
+    }
   }, {
     sequelize,
     modelName: 'Patient',
+    tableName: 'patients'
   });
 
   return Patient;

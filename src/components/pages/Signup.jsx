@@ -5,8 +5,7 @@ const Signup = ({ onBack, onLogin }) => {
         fullName: '',
         email: '',
         password: '',
-        confirmPassword: '',
-        userType: 'patient'
+        // confirmPassword: ''
     });
 
     const handleChange = (e) => {
@@ -16,9 +15,38 @@ const Signup = ({ onBack, onLogin }) => {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Signup attempt:', formData);
+
+        // if (formData.password !== formData.confirmPassword) {
+        //     alert('Passwords do not match');
+        //     return;
+        // }
+
+        try {
+            const response = await fetch('http://localhost:3001/api/auth/register-patient', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    fullName: formData.fullName,
+                    email: formData.email,
+                    password: formData.password
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                alert('Registration successful! Please login.');
+                onLogin();
+            } else {
+                alert(result.message || 'Registration failed');
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
     };
 
     return (
@@ -106,40 +134,6 @@ const Signup = ({ onBack, onLogin }) => {
                                     </div>
 
                                     <div className="mb-3">
-                                        <label className="form-label fw-semibold">Account Type</label>
-                                        <div className="row g-2">
-                                            <div className="col-6">
-                                                <input
-                                                    type="radio"
-                                                    className="btn-check"
-                                                    name="userType"
-                                                    id="patient"
-                                                    value="patient"
-                                                    checked={formData.userType === 'patient'}
-                                                    onChange={handleChange}
-                                                />
-                                                <label className="btn btn-outline-primary w-100" htmlFor="patient">
-                                                    <i className="fas fa-user me-2"></i>Patient
-                                                </label>
-                                            </div>
-                                            <div className="col-6">
-                                                <input
-                                                    type="radio"
-                                                    className="btn-check"
-                                                    name="userType"
-                                                    id="doctor"
-                                                    value="doctor"
-                                                    checked={formData.userType === 'doctor'}
-                                                    onChange={handleChange}
-                                                />
-                                                <label className="btn btn-outline-primary w-100" htmlFor="doctor">
-                                                    <i className="fas fa-user-md me-2"></i>Doctor
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="mb-3">
                                         <label className="form-label fw-semibold">Password</label>
                                         <div className="input-group">
                                             <span className="input-group-text bg-light border-end-0">
@@ -157,7 +151,7 @@ const Signup = ({ onBack, onLogin }) => {
                                         </div>
                                     </div>
 
-                                    <div className="mb-4">
+                                    {/* <div className="mb-4">
                                         <label className="form-label fw-semibold">Confirm Password</label>
                                         <div className="input-group">
                                             <span className="input-group-text bg-light border-end-0">
@@ -173,7 +167,7 @@ const Signup = ({ onBack, onLogin }) => {
                                                 required
                                             />
                                         </div>
-                                    </div>
+                                    </div> */}
 
                                     <div className="form-check mb-4">
                                         <input className="form-check-input" type="checkbox" id="terms" required />

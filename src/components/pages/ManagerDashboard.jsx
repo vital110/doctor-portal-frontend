@@ -1,13 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const ManagerDashboard = ({ onLogout }) => {
   const [showAdminForm, setShowAdminForm] = useState(false);
+  const [showAdminList, setShowAdminList] = useState(false);
+  const [adminCount, setAdminCount] = useState(0);
+  const [adminList, setAdminList] = useState([]);
   const [adminFormData, setAdminFormData] = useState({
     fullName: '',
     email: '',
     password: '',
     role: 'admin'
   });
+
+  useEffect(() => {
+    fetchAdminCount();
+  }, []);
+
+  const fetchAdminCount = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/api/auth/admin-count');
+      const result = await response.json();
+      if (result.success) {
+        setAdminCount(result.count);
+      }
+    } catch (error) {
+      console.error('Error fetching admin count:', error);
+    }
+  };
+
+  const fetchAdminList = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/api/auth/admin-list');
+      const result = await response.json();
+      if (result.success) {
+        setAdminList(result.admins);
+      }
+    } catch (error) {
+      console.error('Error fetching admin list:', error);
+    }
+  };
+
+  const handleAdminCardClick = () => {
+    fetchAdminList();
+    setShowAdminList(true);
+  };
 
   const handleAdminFormChange = (e) => {
     setAdminFormData({
@@ -18,7 +54,6 @@ const ManagerDashboard = ({ onLogout }) => {
 
   const handleAdminSubmit = async (e) => {
     e.preventDefault();
-    console.log('Submitting admin data:', adminFormData);
 
     try {
       const response = await fetch('http://localhost:3001/api/auth/register-admin', {
@@ -30,20 +65,73 @@ const ManagerDashboard = ({ onLogout }) => {
       });
 
       const result = await response.json();
-      console.log('Response:', result);
 
       if (response.ok && result.success) {
         alert(`Admin registered successfully! ID: ${result.admin.id}`);
         setShowAdminForm(false);
         setAdminFormData({ fullName: '', email: '', password: '', role: 'admin' });
+        fetchAdminCount();
       } else {
         alert(result.message || 'Registration failed');
       }
     } catch (error) {
-      console.error('Registration error:', error);
       alert('Error: ' + error.message);
     }
   };
+
+  if (showAdminList) {
+    return (
+      <div className="admin-list-container">
+        <div className="container-fluid h-100">
+          <div className="row justify-content-center align-items-center min-vh-100">
+            <div className="col-md-8 col-lg-6">
+              <div className="admin-list-card">
+                <div className="d-flex justify-content-between align-items-center mb-4">
+                  <h3>Active Admins ({adminCount})</h3>
+                  <button
+                    className="btn btn-outline-secondary"
+                    onClick={() => setShowAdminList(false)}
+                  >
+                    <i className="fas fa-times"></i>
+                  </button>
+                </div>
+                
+                <div className="admin-cards">
+                  {adminList.map((admin) => (
+                    <div key={admin.id} className="admin-detail-card mb-3">
+                      <div className="row align-items-center">
+                        <div className="col-md-2 text-center">
+                          <div className="admin-avatar">
+                            <i className="fas fa-user-shield fa-2x text-primary"></i>
+                          </div>
+                        </div>
+                        <div className="col-md-10">
+                          <div className="admin-info">
+                            <h5 className="mb-1">{admin.fullName}</h5>
+                            <p className="text-muted mb-1">
+                              <i className="fas fa-envelope me-2"></i>
+                              {admin.email}
+                            </p>
+                            <p className="text-muted mb-1">
+                              <i className="fas fa-calendar me-2"></i>
+                              Joined: {new Date(admin.createdAt).toLocaleDateString()}
+                            </p>
+                            <span className={`badge ${admin.role === 'admin' ? 'bg-primary' : admin.role === 'manager' ? 'bg-success' : 'bg-info'}`}>
+                              {admin.role.toUpperCase()}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (showAdminForm) {
     return (
@@ -158,9 +246,9 @@ const ManagerDashboard = ({ onLogout }) => {
       </div>
     );
   }
+
   return (
     <div className="manager-dashboard">
-      {/* Header */}
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
         <div className="container-fluid">
           <span className="navbar-brand">
@@ -178,7 +266,6 @@ const ManagerDashboard = ({ onLogout }) => {
 
       <div className="container-fluid">
         <div className="row">
-          {/* Sidebar */}
           <div className="col-md-3 col-lg-2 bg-light sidebar">
             <div className="p-3">
               <h6 className="text-muted mb-3">MANAGEMENT</h6>
@@ -217,22 +304,24 @@ const ManagerDashboard = ({ onLogout }) => {
             </div>
           </div>
 
-          {/* Main Content */}
           <div className="col-md-9 col-lg-10 main-content">
             <div className="p-4">
               <h2 className="mb-4">Dashboard Overview</h2>
 
-              {/* Stats Cards */}
               <div className="row mb-4">
                 <div className="col-md-3 mb-3">
-                  <div className="card bg-primary text-white">
+                  <div 
+                    className="card bg-primary text-white clickable-card"
+                    onClick={handleAdminCardClick}
+                    style={{cursor: 'pointer'}}
+                  >
                     <div className="card-body">
                       <div className="d-flex justify-content-between">
                         <div>
-                          <h4>150</h4>
-                          <p className="mb-0">Total Doctors</p>
+                          <h4>{adminCount}</h4>
+                          <p className="mb-0">Active Admins</p>
                         </div>
-                        <i className="fas fa-user-md fa-2x opacity-75"></i>
+                        <i className="fas fa-user-shield fa-2x opacity-75"></i>
                       </div>
                     </div>
                   </div>
@@ -278,7 +367,6 @@ const ManagerDashboard = ({ onLogout }) => {
                 </div>
               </div>
 
-              {/* Recent Activities */}
               <div className="row">
                 <div className="col-md-8">
                   <div className="card">

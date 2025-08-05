@@ -157,219 +157,7 @@ html {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Authentication Pages */
-.auth-container {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-}
-
-.auth-background {
-  min-height: 100vh;
-}
-
-.bg-gradient-secondary {
-  background: var(--secondary-gradient);
-}
-
-.auth-form-container {
-  max-width: 400px;
-  width: 100%;
-  padding: 2rem;
-}
-
-.auth-form {
-  background: white;
-  padding: 2rem;
-  border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.auth-form .form-control {
-  border-radius: 10px;
-  padding: 12px 15px;
-  border: 2px solid #e9ecef;
-  transition: all 0.3s ease;
-}
-
-.auth-form .form-control:focus {
-  border-color: #667eea;
-  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-}
-
-.auth-form .input-group-text {
-  border-radius: 10px 0 0 10px;
-  border: 2px solid #e9ecef;
-  border-right: none;
-}
-
-.auth-form .form-control.border-start-0 {
-  border-radius: 0 10px 10px 0;
-  border-left: none;
-}
-
-.auth-form .btn-check:checked + .btn-outline-primary {
-  background: var(--primary-gradient);
-  border-color: transparent;
-  color: white;
-}
-
-.auth-illustration {
-  animation: float 3s ease-in-out infinite;
-}
-
-.navbar {
-  backdrop-filter: blur(10px);
-  background: rgba(255, 255, 255, 0.95) !important;
-}
-
-.navbar-brand {
-  font-size: 1.5rem;
-}
-
-/* Mobile Responsive */
-@media (max-width: 991px) {
-  .auth-form-container {
-    padding: 1rem;
-    max-width: 100%;
-  }
-  
-  .auth-form {
-    padding: 1.5rem;
-    margin: 1rem;
-  }
-}
-
-/* Manager Dashboard */
-.manager-dashboard {
-  min-height: 100vh;
-  background-color: #f8f9fa;
-}
-
-.sidebar {
-  min-height: calc(100vh - 56px);
-  border-right: 1px solid #dee2e6;
-}
-
-.sidebar .nav-link {
-  color: #495057;
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-}
-
-.sidebar .nav-link:hover,
-.sidebar .nav-link.active {
-  background-color: #e9ecef;
-  color: #495057;
-}
-
-.main-content {
-  padding: 0;
-}
-
-.card {
-  border: none;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
-}
-
-.card:hover {
-  transform: translateY(-2px);
-}
-
-.table th {
-  border-top: none;
-  font-weight: 600;
-  color: #495057;
-}
-
-.badge {
-  font-size: 0.75rem;
-  padding: 0.5em 0.75em;
-}
-
-/* Unique Logout Button */
-.logout-container {
-  position: relative;
-}
-
-.logout-btn {
-  background: linear-gradient(45deg, #ff6b6b, #ee5a52);
-  border: none;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 25px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  position: relative;
-  overflow: hidden;
-}
-
-.logout-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.5s;
-}
-
-.logout-btn:hover::before {
-  left: 100%;
-}
-
-.logout-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
-  background: linear-gradient(45deg, #ff5252, #e53935);
-}
-
-.logout-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
-}
-
-.logout-btn i {
-  font-size: 1.1em;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-}
-
-@media (max-width: 768px) {
-  .sidebar {
-    min-height: auto;
-  }
-  
-  .main-content {
-    margin-top: 1rem;
-  }
-  
-  .logout-btn {
-    padding: 8px 16px;
-    font-size: 0.9rem;
-  }
-  
-  .logout-btn span {
-    display: none;
-  }
-}
-
-/* Admin Registration Form - Ultra Flexible & Attractive */
+/* Authentication Pages - Ultra Flexible & Attractive */
 .admin-form-container {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
   min-height: 100vh;
@@ -573,7 +361,7 @@ html {
   transform: translateX(-3px);
 }
 
-/* Responsive Design */
+/* Mobile Optimizations */
 @media (max-width: 576px) {
   .admin-form-card {
     padding: 1rem;
@@ -594,5 +382,196 @@ html {
   
   .admin-form-card h2 {
     font-size: 1.3rem;
+  }
+}
+
+/* Manager Dashboard */
+.manager-dashboard {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.sidebar {
+  min-height: calc(100vh - 56px);
+  border-right: 1px solid #dee2e6;
+}
+
+.sidebar .nav-link {
+  color: #495057;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+.main-content {
+  padding: 0;
+}
+
+.card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+.table th {
+  border-top: none;
+  font-weight: 600;
+  color: #495057;
+}
+
+.badge {
+  font-size: 0.75rem;
+  padding: 0.5em 0.75em;
+}
+
+/* Unique Logout Button */
+.logout-container {
+  position: relative;
+}
+
+.logout-btn {
+  background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.logout-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s;
+}
+
+.logout-btn:hover::before {
+  left: 100%;
+}
+
+.logout-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6);
+  background: linear-gradient(45deg, #ff5252, #e53935);
+}
+
+.logout-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+}
+
+.logout-btn i {
+  font-size: 1.1em;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* Admin List Modal */
+.admin-list-container {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.admin-list-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.admin-detail-card {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 1rem;
+  border: 1px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+.admin-detail-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.admin-avatar {
+  padding: 1rem;
+}
+
+.admin-info h5 {
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.admin-info p {
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.clickable-card {
+  transition: all 0.3s ease;
+}
+
+.clickable-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    min-height: auto;
+  }
+  
+  .main-content {
+    margin-top: 1rem;
+  }
+  
+  .logout-btn {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
+  
+  .logout-btn span {
+    display: none;
+  }
+  
+  .admin-list-card {
+    padding: 1.5rem;
+    margin: 0.5rem;
   }
 }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ManagerDashboard from './ManagerDashboard';
 import AdminDashboard from './AdminDashboard';
+import PatientDashboard from './PatientDashboard';
 
 const Login = ({ onBack, onSignup }) => {
     const [formData, setFormData] = useState({
@@ -9,7 +10,9 @@ const Login = ({ onBack, onSignup }) => {
     });
     const [isManager, setIsManager] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [isPatient, setIsPatient] = useState(false);
     const [adminData, setAdminData] = useState(null);
+    const [patientData, setPatientData] = useState(null);
 
     // Default manager credentials
     const MANAGER_CREDENTIALS = {
@@ -36,8 +39,7 @@ const Login = ({ onBack, onSignup }) => {
 
         // Check admin credentials from database
         try {
-            console.log('Attempting admin login with:', formData.email);
-            const response = await fetch('http://localhost:3001/api/auth/login-admin', {
+            const adminResponse = await fetch('http://localhost:3001/api/auth/login-admin', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -45,26 +47,47 @@ const Login = ({ onBack, onSignup }) => {
                 body: JSON.stringify(formData)
             });
 
-            const result = await response.json();
-            console.log('Login response:', result);
+            const adminResult = await adminResponse.json();
 
-            if (response.ok && result.success) {
-                console.log('Admin login successful:', result.admin);
+            if (adminResponse.ok && adminResult.success) {
                 setIsAdmin(true);
-                setAdminData(result.admin);
-            } else {
-                alert(result.message || 'Invalid credentials');
+                setAdminData(adminResult.admin);
+                return;
             }
         } catch (error) {
-            console.error('Login error:', error);
-            alert('Login error: ' + error.message);
+            console.error('Admin login error:', error);
         }
+
+        // Check patient credentials from database
+        try {
+            const patientResponse = await fetch('http://localhost:3001/api/auth/login-patient', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const patientResult = await patientResponse.json();
+
+            if (patientResponse.ok && patientResult.success) {
+                setIsPatient(true);
+                setPatientData(patientResult.patient);
+                return;
+            }
+        } catch (error) {
+            console.error('Patient login error:', error);
+        }
+
+        alert('Invalid credentials');
     };
 
     const handleLogout = () => {
         setIsManager(false);
         setIsAdmin(false);
+        setIsPatient(false);
         setAdminData(null);
+        setPatientData(null);
         setFormData({ email: '', password: '' });
     };
 
@@ -76,6 +99,11 @@ const Login = ({ onBack, onSignup }) => {
     // Show admin dashboard if authenticated
     if (isAdmin) {
         return <AdminDashboard onLogout={handleLogout} adminData={adminData} />;
+    }
+
+    // Show patient dashboard if authenticated
+    if (isPatient) {
+        return <PatientDashboard onLogout={handleLogout} patientData={patientData} />;
     }
 
     return (
