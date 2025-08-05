@@ -1,6 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
-const { Admin, Patient, Appointment } = require('../models');
+const { Admin, Patient, Appointment, ClinicSetting, Holiday, DoctorLeave } = require('../models');
 const { Op } = require('sequelize');
 const router = express.Router();
 
@@ -207,6 +207,23 @@ router.post('/book-appointment', async (req, res) => {
 
     if (!patientId || !doctorName || !appointmentDate || !appointmentTime || !reason) {
       return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    // Check if doctor is on leave on the appointment date
+    const doctorLeave = await DoctorLeave.findOne({
+      where: {
+        doctorName: doctorName,
+        leaveDate: appointmentDate,
+        isActive: true
+      }
+    });
+
+    if (doctorLeave) {
+      return res.status(400).json({
+        success: false,
+        message: `Dr. ${doctorName} is on leave on ${new Date(appointmentDate).toLocaleDateString()}. Reason: ${doctorLeave.reason}`,
+        isOnLeave: true
+      });
     }
 
     const appointment = await Appointment.create({
@@ -483,6 +500,243 @@ router.get('/admin-list', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error fetching admin list',
+      error: error.message
+    });
+  }
+});
+
+// Get clinic settings
+router.get('/clinic-settings', async (req, res) => {
+  try {
+    const settings = await ClinicSetting.findAll();
+    const settingsObj = {};
+    settings.forEach(setting => {
+      settingsObj[setting.settingKey] = setting.settingValue;
+    });
+
+    res.json({
+      success: true,
+      settings: settingsObj
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching settings',
+      error: error.message
+    });
+  }
+});
+
+// Update clinic settings
+router.post('/clinic-settings', async (req, res) => {
+  try {
+    const { workingHours } = req.body;
+
+    await ClinicSetting.upsert({
+      settingKey: 'working_hours',
+      settingValue: JSON.stringify(workingHours)
+    });
+
+    res.json({
+      success: true,
+      message: 'Settings updated successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error updating settings',
+      error: error.message
+    });
+  }
+});
+
+// Get holidays
+router.get('/holidays', async (req, res) => {
+  try {
+    const holidays = await Holiday.findAll({
+      where: { isActive: true },
+      order: [['date', 'ASC']]
+    });
+
+    res.json({
+      success: true,
+      holidays: holidays
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching holidays',
+      error: error.message
+    });
+  }
+});
+
+// Add holiday
+router.post('/holidays', async (req, res) => {
+  try {
+    const { date, reason } = req.body;
+
+    const holiday = await Holiday.create({
+      date,
+      reason,
+      isActive: true
+    });
+
+    res.json({
+      success: true,
+      message: 'Holiday added successfully',
+      holiday: holiday
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error adding holiday',
+      error: error.message
+    });
+  }
+});
+
+// Delete holiday
+router.delete('/holidays/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await Holiday.update(
+      { isActive: false },
+      { where: { id } }
+    );
+
+    res.json({
+      success: true,
+      message: 'Holiday removed successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error removing holiday',
+      error: error.message
+    });
+  }
+});
+
+// Check if today is holiday
+router.get('/check-holiday', async (req, res) => {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+
+    const holiday = await Holiday.findOne({
+      where: {
+        date: today,
+        isActive: true
+      }
+    });
+
+    res.json({
+      success: true,
+      isHoliday: !!holiday,
+      holiday: holiday
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error checking holiday',
+      error: error.message
+    });
+  }
+});
+
+// Get doctor leaves
+router.get('/doctor-leaves', async (req, res) => {
+  try {
+    const leaves = await DoctorLeave.findAll({
+      where: { isActive: true },
+      order: [['leaveDate', 'ASC']]
+    });
+
+    res.json({
+      success: true,
+      leaves: leaves
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching doctor leaves',
+      error: error.message
+    });
+  }
+});
+
+// Add doctor leave
+router.post('/doctor-leaves', async (req, res) => {
+  try {
+    const { doctorName, leaveDate, reason } = req.body;
+
+    const leave = await DoctorLeave.create({
+      doctorName,
+      leaveDate,
+      reason,
+      isActive: true
+    });
+
+    res.json({
+      success: true,
+      message: 'Doctor leave added successfully',
+      leave: leave
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error adding doctor leave',
+      error: error.message
+    });
+  }
+});
+
+// Delete doctor leave
+router.delete('/doctor-leaves/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await DoctorLeave.update(
+      { isActive: false },
+      { where: { id } }
+    );
+
+    res.json({
+      success: true,
+      message: 'Doctor leave removed successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error removing doctor leave',
+      error: error.message
+    });
+  }
+});
+
+// Check if doctor is on leave
+router.get('/check-doctor-leave', async (req, res) => {
+  try {
+    const { doctorName, date } = req.query;
+
+    const leave = await DoctorLeave.findOne({
+      where: {
+        doctorName: doctorName,
+        leaveDate: date,
+        isActive: true
+      }
+    });
+
+    res.json({
+      success: true,
+      isOnLeave: !!leave,
+      leave: leave
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error checking doctor leave',
       error: error.message
     });
   }

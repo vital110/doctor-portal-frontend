@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import SystemSettings from './SystemSettings';
 
 const AdminDashboard = ({ onLogout, adminData }) => {
   const [appointments, setAppointments] = useState([]);
   const [selectedAppointments, setSelectedAppointments] = useState([]);
   const [currentDate, setCurrentDate] = useState('');
   const [showPreviousFilter, setShowPreviousFilter] = useState(false);
+  const [showSystemSettings, setShowSystemSettings] = useState(false);
   const [filterData, setFilterData] = useState({
     year: '',
     month: '',
@@ -99,6 +101,10 @@ const AdminDashboard = ({ onLogout, adminData }) => {
     }
     fetchPreviousAppointments();
   };
+
+  if (showSystemSettings) {
+    return <SystemSettings onBack={() => setShowSystemSettings(false)} />;
+  }
 
   if (showPreviousFilter) {
     return (
@@ -208,7 +214,7 @@ const AdminDashboard = ({ onLogout, adminData }) => {
                               <td>Dr. {appointment.doctorName}</td>
                               <td>
                                 <span className={`badge ${appointment.status === 'confirmed' ? 'bg-success' :
-                                    appointment.status === 'cancelled' ? 'bg-danger' : 'bg-warning'
+                                  appointment.status === 'cancelled' ? 'bg-danger' : 'bg-warning'
                                   }`}>
                                   {appointment.status.toUpperCase()}
                                 </span>
@@ -283,7 +289,7 @@ const AdminDashboard = ({ onLogout, adminData }) => {
                   </a>
                 </li>
                 <li className="nav-item mb-2">
-                  <a className="nav-link" href="#">
+                  <a className="nav-link" href="#" onClick={() => setShowSystemSettings(true)}>
                     <i className="fas fa-hospital me-2"></i>
                     System Settings
                   </a>
@@ -306,7 +312,7 @@ const AdminDashboard = ({ onLogout, adminData }) => {
                     disabled={selectedAppointments.length === 0}
                   >
                     <i className="fas fa-check me-1"></i>
-                    Confirm Selected
+                    Confirm
                   </button>
                   <button
                     className="btn btn-danger btn-sm"
@@ -314,7 +320,7 @@ const AdminDashboard = ({ onLogout, adminData }) => {
                     disabled={selectedAppointments.length === 0}
                   >
                     <i className="fas fa-times me-1"></i>
-                    Cancel Selected
+                    Cancel
                   </button>
                   <button
                     className="btn btn-info btn-sm"
@@ -397,7 +403,7 @@ const AdminDashboard = ({ onLogout, adminData }) => {
                               </td>
                               <td>
                                 <span className={`badge ${appointment.status === 'confirmed' ? 'bg-success' :
-                                    appointment.status === 'cancelled' ? 'bg-danger' : 'bg-warning'
+                                  appointment.status === 'cancelled' ? 'bg-danger' : 'bg-warning'
                                   }`}>
                                   {appointment.status.toUpperCase()}
                                 </span>

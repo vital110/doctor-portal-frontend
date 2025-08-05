@@ -45,7 +45,11 @@ const PatientDashboard = ({ onLogout, patientData }) => {
           reason: ''
         });
       } else {
-        alert(result.message || 'Booking failed');
+        if (result.isOnLeave) {
+          alert(`❌ ${result.message}\n\nPlease select a different date or doctor.`);
+        } else {
+          alert(result.message || 'Booking failed');
+        }
       }
     } catch (error) {
       alert('Error: ' + error.message);
@@ -154,15 +158,20 @@ const PatientDashboard = ({ onLogout, patientData }) => {
                       <span className="input-group-text bg-light border-end-0">
                         <i className="fas fa-user-md text-muted"></i>
                       </span>
-                      <input
-                        type="text"
+                      <select
                         className="form-control border-start-0 ps-0"
                         name="doctorName"
                         value={appointmentData.doctorName}
                         onChange={handleAppointmentChange}
-                        placeholder="Enter doctor name"
                         required
-                      />
+                      >
+                        <option value="">Select Doctor</option>
+                        <option value="Dr. Smith">Dr. Smith</option>
+                        <option value="Dr. Johnson">Dr. Johnson</option>
+                        <option value="Dr. Williams">Dr. Williams</option>
+                        <option value="Dr. Brown">Dr. Brown</option>
+                        <option value="Dr. Davis">Dr. Davis</option>
+                      </select>
                     </div>
                   </div>
 

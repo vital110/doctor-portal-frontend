@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const Signup = ({ onBack, onLogin }) => {
     const [formData, setFormData] = useState({
@@ -7,6 +7,25 @@ const Signup = ({ onBack, onLogin }) => {
         password: '',
         // confirmPassword: ''
     });
+    const [isHoliday, setIsHoliday] = useState(false);
+    const [holidayInfo, setHolidayInfo] = useState(null);
+
+    useEffect(() => {
+        checkHoliday();
+    }, []);
+
+    const checkHoliday = async () => {
+        try {
+            const response = await fetch('http://localhost:3001/api/auth/check-holiday');
+            const result = await response.json();
+            if (result.success && result.isHoliday) {
+                setIsHoliday(true);
+                setHolidayInfo(result.holiday);
+            }
+        } catch (error) {
+            console.error('Error checking holiday:', error);
+        }
+    };
 
     const handleChange = (e) => {
         setFormData({
@@ -96,6 +115,22 @@ const Signup = ({ onBack, onLogin }) => {
                                     <p className="text-muted">Start your healthcare journey with us</p>
                                 </div>
 
+                                {isHoliday && (
+                                    <div className="alert alert-warning mb-4">
+                                        <div className="d-flex align-items-center">
+                                            <i className="fas fa-calendar-times fa-2x me-3 text-warning"></i>
+                                            <div>
+                                                <h5 className="alert-heading mb-1">Holiday Notice</h5>
+                                                <p className="mb-0">
+                                                    <strong>Today is a holiday:</strong> {holidayInfo?.reason}
+                                                    <br />
+                                                    <small className="text-muted">Registration is temporarily disabled. Please try again tomorrow.</small>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
                                 <form onSubmit={handleSubmit} className="auth-form">
                                     <div className="mb-3">
                                         <label className="form-label fw-semibold">Full Name</label>
@@ -110,6 +145,7 @@ const Signup = ({ onBack, onLogin }) => {
                                                 value={formData.fullName}
                                                 onChange={handleChange}
                                                 placeholder="Enter your full name"
+                                                disabled={isHoliday}
                                                 required
                                             />
                                         </div>
@@ -128,6 +164,7 @@ const Signup = ({ onBack, onLogin }) => {
                                                 value={formData.email}
                                                 onChange={handleChange}
                                                 placeholder="Enter your email"
+                                                disabled={isHoliday}
                                                 required
                                             />
                                         </div>
@@ -146,6 +183,7 @@ const Signup = ({ onBack, onLogin }) => {
                                                 value={formData.password}
                                                 onChange={handleChange}
                                                 placeholder="Create a password"
+                                                disabled={isHoliday}
                                                 required
                                             />
                                         </div>
@@ -170,14 +208,14 @@ const Signup = ({ onBack, onLogin }) => {
                                     </div> */}
 
                                     <div className="form-check mb-4">
-                                        <input className="form-check-input" type="checkbox" id="terms" required />
+                                        <input className="form-check-input" type="checkbox" id="terms" disabled={isHoliday} required />
                                         <label className="form-check-label text-muted" htmlFor="terms">
                                             I agree to the <a href="#" className="text-primary">Terms of Service</a> and <a href="#" className="text-primary">Privacy Policy</a>
                                         </label>
                                     </div>
 
-                                    <button type="submit" className="btn btn-primary w-100 py-3 mb-4">
-                                        Create Account
+                                    <button type="submit" className="btn btn-primary w-100 py-3 mb-4" disabled={isHoliday}>
+                                        {isHoliday ? 'Registration Closed - Holiday' : 'Create Account'}
                                     </button>
 
                                     <div className="text-center">
