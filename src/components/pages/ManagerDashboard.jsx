@@ -3,8 +3,15 @@ import React, { useState, useEffect } from 'react';
 const ManagerDashboard = ({ onLogout }) => {
   const [showAdminForm, setShowAdminForm] = useState(false);
   const [showAdminList, setShowAdminList] = useState(false);
+  const [showAppointmentFilter, setShowAppointmentFilter] = useState(false);
   const [adminCount, setAdminCount] = useState(0);
   const [adminList, setAdminList] = useState([]);
+  const [appointmentCount, setAppointmentCount] = useState(null);
+  const [filterData, setFilterData] = useState({
+    year: '',
+    month: '',
+    date: ''
+  });
   const [adminFormData, setAdminFormData] = useState({
     fullName: '',
     email: '',
@@ -40,9 +47,50 @@ const ManagerDashboard = ({ onLogout }) => {
     }
   };
 
+  const fetchAppointmentsByDate = async () => {
+    try {
+      const params = new URLSearchParams();
+      if (filterData.year) params.append('year', filterData.year);
+      if (filterData.month) params.append('month', filterData.month);
+      if (filterData.date) params.append('date', filterData.date);
+
+      const response = await fetch(`http://localhost:3001/api/auth/appointments-by-date?${params}`);
+      const result = await response.json();
+      
+      if (result.success) {
+        setAppointmentCount(result.count);
+      }
+    } catch (error) {
+      console.error('Error fetching appointments:', error);
+      alert('Error fetching appointments: ' + error.message);
+    }
+  };
+
   const handleAdminCardClick = () => {
     fetchAdminList();
     setShowAdminList(true);
+  };
+
+  const handleAppointmentCardClick = () => {
+    setAppointmentCount(null); // Reset count when opening filter
+    setFilterData({ year: '', month: '', date: '' }); // Reset form
+    setShowAppointmentFilter(true);
+  };
+
+  const handleFilterChange = (e) => {
+    setFilterData({
+      ...filterData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleFilterSubmit = (e) => {
+    e.preventDefault();
+    if (!filterData.year) {
+      alert('Please enter a year');
+      return;
+    }
+    fetchAppointmentsByDate();
   };
 
   const handleAdminFormChange = (e) => {
@@ -79,6 +127,103 @@ const ManagerDashboard = ({ onLogout }) => {
     }
   };
 
+  if (showAppointmentFilter) {
+    return (
+      <div className="appointment-filter-container">
+        <div className="container-fluid h-100">
+          <div className="row justify-content-center align-items-center min-vh-100">
+            <div className="col-md-6 col-lg-5">
+              <div className="admin-form-card">
+                <div className="text-center mb-4">
+                  <button
+                    className="back-btn"
+                    onClick={() => setShowAppointmentFilter(false)}
+                  >
+                    <i className="fas fa-arrow-left me-2"></i>
+                    Back to Dashboard
+                  </button>
+                  <h2>Filter Appointments</h2>
+                  <p className="text-muted">Check appointments by date</p>
+                </div>
+
+                <form onSubmit={handleFilterSubmit}>
+                  <div className="mb-3">
+                    <label className="form-label fw-semibold">Year *</label>
+                    <input
+                      type="number"
+                      className="form-control"
+                      name="year"
+                      value={filterData.year}
+                      onChange={handleFilterChange}
+                      placeholder="Enter year (e.g., 2024)"
+                      min="2020"
+                      max="2030"
+                      required
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label fw-semibold">Month (Optional)</label>
+                    <select
+                      className="form-control"
+                      name="month"
+                      value={filterData.month}
+                      onChange={handleFilterChange}
+                    >
+                      <option value="">Select month</option>
+                      <option value="1">January</option>
+                      <option value="2">February</option>
+                      <option value="3">March</option>
+                      <option value="4">April</option>
+                      <option value="5">May</option>
+                      <option value="6">June</option>
+                      <option value="7">July</option>
+                      <option value="8">August</option>
+                      <option value="9">September</option>
+                      <option value="10">October</option>
+                      <option value="11">November</option>
+                      <option value="12">December</option>
+                    </select>
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="form-label fw-semibold">Date (Optional)</label>
+                    <input
+                      type="number"
+                      className="form-control"
+                      name="date"
+                      value={filterData.date}
+                      onChange={handleFilterChange}
+                      placeholder="Enter date (1-31)"
+                      min="1"
+                      max="31"
+                    />
+                  </div>
+
+                  <button type="submit" className="btn btn-primary w-100 py-3 mb-3">
+                    <i className="fas fa-search me-2"></i>
+                    Check Appointments
+                  </button>
+                </form>
+
+                {appointmentCount !== null && (
+                  <div className="alert alert-success text-center">
+                    <h4 className="mb-2">{appointmentCount} Appointments</h4>
+                    <p className="mb-0">
+                      Found for {filterData.year}
+                      {filterData.month && ` - ${new Date(0, filterData.month - 1).toLocaleString('default', { month: 'long' })}`}
+                      {filterData.date && ` - ${filterData.date}`}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (showAdminList) {
     return (
       <div className="admin-list-container">
@@ -95,7 +240,7 @@ const ManagerDashboard = ({ onLogout }) => {
                     <i className="fas fa-times"></i>
                   </button>
                 </div>
-
+                
                 <div className="admin-cards">
                   {adminList.map((admin) => (
                     <div key={admin.id} className="admin-detail-card mb-3">
@@ -289,7 +434,7 @@ const ManagerDashboard = ({ onLogout }) => {
                   </a>
                 </li>
                 <li className="nav-item mb-2">
-                  <a className="nav-link" href="#">
+                  <a className="nav-link" href="#" onClick={handleAppointmentCardClick}>
                     <i className="fas fa-calendar-alt me-2"></i>
                     Appointments
                   </a>
@@ -340,12 +485,16 @@ const ManagerDashboard = ({ onLogout }) => {
                   </div>
                 </div>
                 <div className="col-md-3 mb-3">
-                  <div className="card bg-warning text-white">
+                  <div
+                    className="card bg-warning text-white clickable-card"
+                    onClick={handleAppointmentCardClick}
+                    style={{ cursor: 'pointer' }}
+                  >
                     <div className="card-body">
                       <div className="d-flex justify-content-between">
                         <div>
-                          <h4>89</h4>
-                          <p className="mb-0">Today's Appointments</p>
+                          <h4>Filter</h4>
+                          <p className="mb-0">Check Appointments</p>
                         </div>
                         <i className="fas fa-calendar-check fa-2x opacity-75"></i>
                       </div>
@@ -396,11 +545,14 @@ const ManagerDashboard = ({ onLogout }) => {
                           <i className="fas fa-plus me-2"></i>
                           Add New Doctor
                         </button>
-                        <button className="btn btn-info">
-                          <i className="fas fa-calendar-plus me-2"></i>
-                          Schedule Appointment
+                        <button
+                          className="btn btn-warning"
+                          onClick={handleAppointmentCardClick}
+                        >
+                          <i className="fas fa-calendar-search me-2"></i>
+                          Filter Appointments
                         </button>
-                        <button className="btn btn-warning">
+                        <button className="btn btn-info">
                           <i className="fas fa-file-alt me-2"></i>
                           Generate Report
                         </button>

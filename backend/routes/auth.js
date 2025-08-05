@@ -1,7 +1,31 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const { Admin, Patient, Appointment } = require('../models');
+const { Op } = require('sequelize');
 const router = express.Router();
+
+// Auto cleanup function - delete old appointments
+const cleanupOldAppointments = async () => {
+  try {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    yesterday.setHours(23, 59, 59, 999);
+
+    await Appointment.destroy({
+      where: {
+        appointmentDate: {
+          [Op.lt]: yesterday
+        }
+      }
+    });
+    console.log('Old appointments cleaned up');
+  } catch (error) {
+    console.error('Error cleaning up appointments:', error);
+  }
+};
+
+// Run cleanup every hour
+setInterval(cleanupOldAppointments, 60 * 60 * 1000);
 
 // Register new admin
 router.post('/register-admin', async (req, res) => {
@@ -26,7 +50,7 @@ router.post('/register-admin', async (req, res) => {
       role
     });
 
-    res.status(201).json({ 
+    res.status(201).json({
       success: true,
       message: 'Admin registered successfully',
       admin: {
@@ -38,10 +62,10 @@ router.post('/register-admin', async (req, res) => {
     });
   } catch (error) {
     console.error('Admin registration error:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: 'Server error during registration', 
-      error: error.message 
+      message: 'Server error during registration',
+      error: error.message
     });
   }
 });
@@ -57,17 +81,17 @@ router.post('/login-admin', async (req, res) => {
 
     const admin = await Admin.findOne({ where: { email } });
     if (!admin) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         success: false,
-        message: 'Invalid email or password' 
+        message: 'Invalid email or password'
       });
     }
 
     const isValidPassword = await bcrypt.compare(password, admin.password);
     if (!isValidPassword) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         success: false,
-        message: 'Invalid email or password' 
+        message: 'Invalid email or password'
       });
     }
 
@@ -83,10 +107,10 @@ router.post('/login-admin', async (req, res) => {
     });
   } catch (error) {
     console.error('Admin login error:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: 'Server error during login', 
-      error: error.message 
+      message: 'Server error during login',
+      error: error.message
     });
   }
 });
@@ -113,7 +137,7 @@ router.post('/register-patient', async (req, res) => {
       password: hashedPassword
     });
 
-    res.status(201).json({ 
+    res.status(201).json({
       success: true,
       message: 'Patient registered successfully',
       patient: {
@@ -124,10 +148,10 @@ router.post('/register-patient', async (req, res) => {
     });
   } catch (error) {
     console.error('Patient registration error:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: 'Server error during registration', 
-      error: error.message 
+      message: 'Server error during registration',
+      error: error.message
     });
   }
 });
@@ -143,17 +167,17 @@ router.post('/login-patient', async (req, res) => {
 
     const patient = await Patient.findOne({ where: { email } });
     if (!patient) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         success: false,
-        message: 'Invalid email or password' 
+        message: 'Invalid email or password'
       });
     }
 
     const isValidPassword = await bcrypt.compare(password, patient.password);
     if (!isValidPassword) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         success: false,
-        message: 'Invalid email or password' 
+        message: 'Invalid email or password'
       });
     }
 
@@ -168,10 +192,10 @@ router.post('/login-patient', async (req, res) => {
     });
   } catch (error) {
     console.error('Patient login error:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
-      message: 'Server error during login', 
-      error: error.message 
+      message: 'Server error during login',
+      error: error.message
     });
   }
 });
@@ -240,6 +264,93 @@ router.get('/patient-appointments/:patientId', async (req, res) => {
   }
 });
 
+// Get today's appointments for admin (date-wise)
+router.get('/today-appointments', async (req, res) => {
+  try {
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+
+    const appointments = await Appointment.findAll({
+      where: {
+        appointmentDate: {
+          [Op.between]: [startOfDay, endOfDay]
+        }
+      },
+      include: [{
+        model: Patient,
+        as: 'patient',
+        attributes: ['fullName', 'email']
+      }],
+      order: [['appointmentTime', 'ASC']]
+    });
+
+    res.json({
+      success: true,
+      appointments: appointments,
+      date: today.toDateString()
+    });
+  } catch (error) {
+    console.error('Error fetching today appointments:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching appointments',
+      error: error.message
+    });
+  }
+});
+
+// Get appointments by date for admin
+router.get('/admin-appointments-by-date', async (req, res) => {
+  try {
+    const { year, month, date } = req.query;
+    let whereClause = {};
+    let filterDescription = '';
+
+    if (year && month && date) {
+      // Specific date
+      const startDate = new Date(year, month - 1, date);
+      const endDate = new Date(year, month - 1, date, 23, 59, 59);
+      whereClause.appointmentDate = {
+        [Op.between]: [startDate, endDate]
+      };
+      filterDescription = `${date}/${month}/${year}`;
+    } else if (year && month) {
+      // Specific month
+      const startDate = new Date(year, month - 1, 1);
+      const endDate = new Date(year, month, 0, 23, 59, 59);
+      whereClause.appointmentDate = {
+        [Op.between]: [startDate, endDate]
+      };
+      filterDescription = `${new Date(0, month - 1).toLocaleString('default', { month: 'long' })} ${year}`;
+    }
+
+    const appointments = await Appointment.findAll({
+      where: whereClause,
+      include: [{
+        model: Patient,
+        as: 'patient',
+        attributes: ['fullName', 'email']
+      }],
+      order: [['appointmentDate', 'DESC'], ['appointmentTime', 'ASC']]
+    });
+
+    res.json({
+      success: true,
+      appointments: appointments,
+      filter: filterDescription,
+      count: appointments.length
+    });
+  } catch (error) {
+    console.error('Error fetching appointments by date:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching appointments',
+      error: error.message
+    });
+  }
+});
+
 // Get all appointments for admin
 router.get('/all-appointments', async (req, res) => {
   try {
@@ -258,6 +369,52 @@ router.get('/all-appointments', async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching all appointments:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching appointments',
+      error: error.message
+    });
+  }
+});
+
+// Get appointments by date filter for manager
+router.get('/appointments-by-date', async (req, res) => {
+  try {
+    const { year, month, date } = req.query;
+    let whereClause = {};
+
+    if (year && month && date) {
+      // Specific date
+      const startDate = new Date(year, month - 1, date);
+      const endDate = new Date(year, month - 1, date, 23, 59, 59);
+      whereClause.appointmentDate = {
+        [Op.between]: [startDate, endDate]
+      };
+    } else if (year && month) {
+      // Specific month
+      const startDate = new Date(year, month - 1, 1);
+      const endDate = new Date(year, month, 0, 23, 59, 59);
+      whereClause.appointmentDate = {
+        [Op.between]: [startDate, endDate]
+      };
+    } else if (year) {
+      // Specific year
+      const startDate = new Date(year, 0, 1);
+      const endDate = new Date(year, 11, 31, 23, 59, 59);
+      whereClause.appointmentDate = {
+        [Op.between]: [startDate, endDate]
+      };
+    }
+
+    const count = await Appointment.count({ where: whereClause });
+
+    res.json({
+      success: true,
+      count: count,
+      filter: { year, month, date }
+    });
+  } catch (error) {
+    console.error('Error fetching appointments by date:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching appointments',
@@ -316,7 +473,7 @@ router.get('/admin-list', async (req, res) => {
       attributes: ['id', 'fullName', 'email', 'role', 'createdAt'],
       order: [['createdAt', 'DESC']]
     });
-    
+
     res.json({
       success: true,
       admins: admins
