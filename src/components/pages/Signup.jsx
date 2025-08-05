@@ -1,0 +1,211 @@
+import React, { useState } from 'react';
+
+const Signup = ({ onBack, onLogin }) => {
+    const [formData, setFormData] = useState({
+        fullName: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        userType: 'patient'
+    });
+
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        });
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        console.log('Signup attempt:', formData);
+    };
+
+    return (
+        <div className="auth-container">
+            <div className="auth-background">
+                <div className="container-fluid h-100">
+                    <div className="row h-100">
+                        {/* Left Side - Image/Info */}
+                        <div className="col-lg-6 d-none d-lg-flex align-items-center justify-content-center bg-gradient-secondary">
+                            <div className="text-center text-white p-5">
+                                <div className="auth-illustration mb-4">
+                                    <i className="fas fa-user-plus fa-5x mb-4 opacity-75"></i>
+                                </div>
+                                <h3 className="fw-bold mb-3">Join Our Healthcare Community</h3>
+                                <p className="lead opacity-90 mb-4">
+                                    Get personalized healthcare services and connect with top medical professionals
+                                </p>
+                                <div className="row text-center">
+                                    <div className="col-4">
+                                        <i className="fas fa-shield-alt fa-2x mb-2"></i>
+                                        <p className="small mb-0">Secure & Private</p>
+                                    </div>
+                                    <div className="col-4">
+                                        <i className="fas fa-clock fa-2x mb-2"></i>
+                                        <p className="small mb-0">24/7 Available</p>
+                                    </div>
+                                    <div className="col-4">
+                                        <i className="fas fa-award fa-2x mb-2"></i>
+                                        <p className="small mb-0">Expert Care</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Right Side - Form */}
+                        <div className="col-lg-6 d-flex align-items-center justify-content-center">
+                            <div className="auth-form-container">
+                                <div className="text-center mb-4">
+                                    <button
+                                        className="btn btn-link text-muted p-0 mb-3"
+                                        onClick={onBack}
+                                    >
+                                        <i className="fas fa-arrow-left me-2"></i>
+                                        Back to Home
+                                    </button>
+                                    <h2 className="fw-bold text-dark mb-2">Create Account</h2>
+                                    <p className="text-muted">Start your healthcare journey with us</p>
+                                </div>
+
+                                <form onSubmit={handleSubmit} className="auth-form">
+                                    <div className="mb-3">
+                                        <label className="form-label fw-semibold">Full Name</label>
+                                        <div className="input-group">
+                                            <span className="input-group-text bg-light border-end-0">
+                                                <i className="fas fa-user text-muted"></i>
+                                            </span>
+                                            <input
+                                                type="text"
+                                                className="form-control border-start-0 ps-0"
+                                                name="fullName"
+                                                value={formData.fullName}
+                                                onChange={handleChange}
+                                                placeholder="Enter your full name"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="mb-3">
+                                        <label className="form-label fw-semibold">Email Address</label>
+                                        <div className="input-group">
+                                            <span className="input-group-text bg-light border-end-0">
+                                                <i className="fas fa-envelope text-muted"></i>
+                                            </span>
+                                            <input
+                                                type="email"
+                                                className="form-control border-start-0 ps-0"
+                                                name="email"
+                                                value={formData.email}
+                                                onChange={handleChange}
+                                                placeholder="Enter your email"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="mb-3">
+                                        <label className="form-label fw-semibold">Account Type</label>
+                                        <div className="row g-2">
+                                            <div className="col-6">
+                                                <input
+                                                    type="radio"
+                                                    className="btn-check"
+                                                    name="userType"
+                                                    id="patient"
+                                                    value="patient"
+                                                    checked={formData.userType === 'patient'}
+                                                    onChange={handleChange}
+                                                />
+                                                <label className="btn btn-outline-primary w-100" htmlFor="patient">
+                                                    <i className="fas fa-user me-2"></i>Patient
+                                                </label>
+                                            </div>
+                                            <div className="col-6">
+                                                <input
+                                                    type="radio"
+                                                    className="btn-check"
+                                                    name="userType"
+                                                    id="doctor"
+                                                    value="doctor"
+                                                    checked={formData.userType === 'doctor'}
+                                                    onChange={handleChange}
+                                                />
+                                                <label className="btn btn-outline-primary w-100" htmlFor="doctor">
+                                                    <i className="fas fa-user-md me-2"></i>Doctor
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="mb-3">
+                                        <label className="form-label fw-semibold">Password</label>
+                                        <div className="input-group">
+                                            <span className="input-group-text bg-light border-end-0">
+                                                <i className="fas fa-lock text-muted"></i>
+                                            </span>
+                                            <input
+                                                type="password"
+                                                className="form-control border-start-0 ps-0"
+                                                name="password"
+                                                value={formData.password}
+                                                onChange={handleChange}
+                                                placeholder="Create a password"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="mb-4">
+                                        <label className="form-label fw-semibold">Confirm Password</label>
+                                        <div className="input-group">
+                                            <span className="input-group-text bg-light border-end-0">
+                                                <i className="fas fa-lock text-muted"></i>
+                                            </span>
+                                            <input
+                                                type="password"
+                                                className="form-control border-start-0 ps-0"
+                                                name="confirmPassword"
+                                                value={formData.confirmPassword}
+                                                onChange={handleChange}
+                                                placeholder="Confirm your password"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="form-check mb-4">
+                                        <input className="form-check-input" type="checkbox" id="terms" required />
+                                        <label className="form-check-label text-muted" htmlFor="terms">
+                                            I agree to the <a href="#" className="text-primary">Terms of Service</a> and <a href="#" className="text-primary">Privacy Policy</a>
+                                        </label>
+                                    </div>
+
+                                    <button type="submit" className="btn btn-primary w-100 py-3 mb-4">
+                                        Create Account
+                                    </button>
+
+                                    <div className="text-center">
+                                        <p className="text-muted mb-0">
+                                            Already have an account?{' '}
+                                            <button
+                                                type="button"
+                                                className="btn btn-link text-primary p-0 text-decoration-none"
+                                                onClick={onLogin}
+                                            >
+                                                Sign in here
+                                            </button>
+                                        </p>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default Signup;
