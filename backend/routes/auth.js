@@ -240,6 +240,57 @@ router.get('/patient-appointments/:patientId', async (req, res) => {
   }
 });
 
+// Get all appointments for admin
+router.get('/all-appointments', async (req, res) => {
+  try {
+    const appointments = await Appointment.findAll({
+      include: [{
+        model: Patient,
+        as: 'patient',
+        attributes: ['fullName', 'email']
+      }],
+      order: [['appointmentDate', 'DESC']]
+    });
+
+    res.json({
+      success: true,
+      appointments: appointments
+    });
+  } catch (error) {
+    console.error('Error fetching all appointments:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching appointments',
+      error: error.message
+    });
+  }
+});
+
+// Update appointment status
+router.put('/update-appointment/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    await Appointment.update(
+      { status },
+      { where: { id } }
+    );
+
+    res.json({
+      success: true,
+      message: 'Appointment status updated'
+    });
+  } catch (error) {
+    console.error('Error updating appointment:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error updating appointment',
+      error: error.message
+    });
+  }
+});
+
 // Get admin count
 router.get('/admin-count', async (req, res) => {
   try {
