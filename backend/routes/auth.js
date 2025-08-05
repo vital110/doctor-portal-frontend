@@ -1,6 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
-const { Admin, Patient } = require('../models');
+const { Admin, Patient, Appointment } = require('../models');
 const router = express.Router();
 
 // Register new admin
@@ -172,6 +172,70 @@ router.post('/login-patient', async (req, res) => {
       success: false,
       message: 'Server error during login', 
       error: error.message 
+    });
+  }
+});
+
+// Book appointment
+router.post('/book-appointment', async (req, res) => {
+  try {
+    const { patientId, doctorName, appointmentDate, appointmentTime, reason } = req.body;
+
+    if (!patientId || !doctorName || !appointmentDate || !appointmentTime || !reason) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    const appointment = await Appointment.create({
+      patientId,
+      doctorName,
+      appointmentDate,
+      appointmentTime,
+      reason,
+      status: 'pending'
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'Appointment booked successfully',
+      appointment: {
+        id: appointment.id,
+        doctorName: appointment.doctorName,
+        appointmentDate: appointment.appointmentDate,
+        appointmentTime: appointment.appointmentTime,
+        reason: appointment.reason,
+        status: appointment.status
+      }
+    });
+  } catch (error) {
+    console.error('Appointment booking error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error during booking',
+      error: error.message
+    });
+  }
+});
+
+// Get patient appointments
+router.get('/patient-appointments/:patientId', async (req, res) => {
+  try {
+    const { patientId } = req.params;
+
+    const appointments = await Appointment.findAll({
+      where: { patientId },
+      order: [['appointmentDate', 'DESC']]
+    });
+
+    res.json({
+      success: true,
+      appointments: appointments
+    });
+  } catch (error) {
+    console.error('Error fetching appointments:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching appointments',
+      error: error.message
     });
   }
 });

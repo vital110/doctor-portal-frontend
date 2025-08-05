@@ -1,6 +1,244 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const PatientDashboard = ({ onLogout, patientData }) => {
+  const [showAppointmentForm, setShowAppointmentForm] = useState(false);
+  const [showAppointments, setShowAppointments] = useState(false);
+  const [appointments, setAppointments] = useState([]);
+  const [appointmentData, setAppointmentData] = useState({
+    doctorName: '',
+    appointmentDate: '',
+    appointmentTime: '',
+    reason: ''
+  });
+
+  const handleAppointmentChange = (e) => {
+    setAppointmentData({
+      ...appointmentData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleAppointmentSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch('http://localhost:3001/api/auth/book-appointment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          patientId: patientData.id,
+          ...appointmentData
+        })
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        alert('Appointment booked successfully!');
+        setShowAppointmentForm(false);
+        setAppointmentData({
+          doctorName: '',
+          appointmentDate: '',
+          appointmentTime: '',
+          reason: ''
+        });
+      } else {
+        alert(result.message || 'Booking failed');
+      }
+    } catch (error) {
+      alert('Error: ' + error.message);
+    }
+  };
+
+  const fetchAppointments = async () => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/auth/patient-appointments/${patientData.id}`);
+      const result = await response.json();
+      
+      if (result.success) {
+        setAppointments(result.appointments);
+        setShowAppointments(true);
+      }
+    } catch (error) {
+      alert('Error fetching appointments: ' + error.message);
+    }
+  };
+
+  if (showAppointments) {
+    return (
+      <div className="appointments-view-container">
+        <div className="container-fluid h-100">
+          <div className="row justify-content-center align-items-center min-vh-100">
+            <div className="col-md-10 col-lg-8">
+              <div className="appointments-view-card">
+                <div className="d-flex justify-content-between align-items-center mb-4">
+                  <h3>My Appointments</h3>
+                  <button
+                    className="btn btn-outline-secondary"
+                    onClick={() => setShowAppointments(false)}
+                  >
+                    <i className="fas fa-times"></i>
+                  </button>
+                </div>
+                
+                <div className="appointments-list">
+                  {appointments.length === 0 ? (
+                    <div className="text-center py-5">
+                      <i className="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                      <p className="text-muted">No appointments found</p>
+                    </div>
+                  ) : (
+                    appointments.map((appointment) => (
+                      <div key={appointment.id} className="appointment-card mb-3">
+                        <div className="row align-items-center">
+                          <div className="col-md-3">
+                            <div className="appointment-date">
+                              <i className="fas fa-calendar text-primary me-2"></i>
+                              {new Date(appointment.appointmentDate).toLocaleDateString()}
+                            </div>
+                            <div className="appointment-time">
+                              <i className="fas fa-clock text-info me-2"></i>
+                              {appointment.appointmentTime}
+                            </div>
+                          </div>
+                          <div className="col-md-6">
+                            <h5 className="mb-1">Dr. {appointment.doctorName}</h5>
+                            <p className="text-muted mb-1">{appointment.reason}</p>
+                          </div>
+                          <div className="col-md-3 text-end">
+                            <span className={`badge ${
+                              appointment.status === 'confirmed' ? 'bg-success' : 
+                              appointment.status === 'cancelled' ? 'bg-danger' : 'bg-warning'
+                            }`}>
+                              {appointment.status.toUpperCase()}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (showAppointmentForm) {
+    return (
+      <div className="appointment-form-container">
+        <div className="container-fluid h-100">
+          <div className="row justify-content-center align-items-center min-vh-100">
+            <div className="col-md-6 col-lg-5">
+              <div className="appointment-form-card">
+                <div className="text-center mb-4">
+                  <button
+                    className="back-btn"
+                    onClick={() => setShowAppointmentForm(false)}
+                  >
+                    <i className="fas fa-arrow-left me-2"></i>
+                    Back to Dashboard
+                  </button>
+                  <h2>Book Appointment</h2>
+                  <p className="text-muted">Schedule your medical consultation</p>
+                </div>
+
+                <form onSubmit={handleAppointmentSubmit}>
+                  <div className="mb-3">
+                    <label className="form-label fw-semibold">Doctor Name</label>
+                    <div className="input-group">
+                      <span className="input-group-text bg-light border-end-0">
+                        <i className="fas fa-user-md text-muted"></i>
+                      </span>
+                      <input
+                        type="text"
+                        className="form-control border-start-0 ps-0"
+                        name="doctorName"
+                        value={appointmentData.doctorName}
+                        onChange={handleAppointmentChange}
+                        placeholder="Enter doctor name"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label fw-semibold">Appointment Date</label>
+                    <div className="input-group">
+                      <span className="input-group-text bg-light border-end-0">
+                        <i className="fas fa-calendar text-muted"></i>
+                      </span>
+                      <input
+                        type="date"
+                        className="form-control border-start-0 ps-0"
+                        name="appointmentDate"
+                        value={appointmentData.appointmentDate}
+                        onChange={handleAppointmentChange}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label fw-semibold">Appointment Time</label>
+                    <div className="input-group">
+                      <span className="input-group-text bg-light border-end-0">
+                        <i className="fas fa-clock text-muted"></i>
+                      </span>
+                      <select
+                        className="form-control border-start-0 ps-0"
+                        name="appointmentTime"
+                        value={appointmentData.appointmentTime}
+                        onChange={handleAppointmentChange}
+                        required
+                      >
+                        <option value="">Select time</option>
+                        <option value="09:00 AM">09:00 AM</option>
+                        <option value="10:00 AM">10:00 AM</option>
+                        <option value="11:00 AM">11:00 AM</option>
+                        <option value="02:00 PM">02:00 PM</option>
+                        <option value="03:00 PM">03:00 PM</option>
+                        <option value="04:00 PM">04:00 PM</option>
+                        <option value="05:00 PM">05:00 PM</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="form-label fw-semibold">Reason for Visit</label>
+                    <div className="input-group">
+                      <span className="input-group-text bg-light border-end-0">
+                        <i className="fas fa-notes-medical text-muted"></i>
+                      </span>
+                      <textarea
+                        className="form-control border-start-0 ps-0"
+                        name="reason"
+                        value={appointmentData.reason}
+                        onChange={handleAppointmentChange}
+                        placeholder="Describe your symptoms or reason for visit"
+                        rows="3"
+                        required
+                      ></textarea>
+                    </div>
+                  </div>
+
+                  <button type="submit" className="btn btn-primary w-100 py-3">
+                    <i className="fas fa-calendar-plus me-2"></i>
+                    Book Appointment
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="patient-dashboard">
       <nav className="navbar navbar-expand-lg navbar-dark bg-info">
@@ -31,9 +269,15 @@ const PatientDashboard = ({ onLogout, patientData }) => {
                   </a>
                 </li>
                 <li className="nav-item mb-2">
-                  <a className="nav-link" href="#">
+                  <a className="nav-link" href="#" onClick={() => setShowAppointmentForm(true)}>
                     <i className="fas fa-calendar-plus me-2"></i>
                     Book Appointment
+                  </a>
+                </li>
+                <li className="nav-item mb-2">
+                  <a className="nav-link" href="#" onClick={fetchAppointments}>
+                    <i className="fas fa-calendar-check me-2"></i>
+                    View Appointments
                   </a>
                 </li>
                 <li className="nav-item mb-2">
@@ -82,15 +326,21 @@ const PatientDashboard = ({ onLogout, patientData }) => {
                 <div className="card-body">
                   <div className="row">
                     <div className="col-md-3 mb-3">
-                      <button className="btn btn-primary w-100">
+                      <button 
+                        className="btn btn-primary w-100"
+                        onClick={() => setShowAppointmentForm(true)}
+                      >
                         <i className="fas fa-calendar-plus me-2"></i>
                         Book Appointment
                       </button>
                     </div>
                     <div className="col-md-3 mb-3">
-                      <button className="btn btn-success w-100">
-                        <i className="fas fa-file-medical me-2"></i>
-                        View Records
+                      <button 
+                        className="btn btn-success w-100"
+                        onClick={fetchAppointments}
+                      >
+                        <i className="fas fa-calendar-check me-2"></i>
+                        View Appointments
                       </button>
                     </div>
                     <div className="col-md-3 mb-3">
