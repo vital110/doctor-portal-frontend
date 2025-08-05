@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  
+
   ClinicSetting.init({
     settingKey: {
       type: DataTypes.STRING,
@@ -23,6 +23,6 @@ module.exports = (sequelize, DataTypes) => {
     modelName: 'ClinicSetting',
     tableName: 'clinic_settings'
   });
-  
+
   return ClinicSetting;
 };

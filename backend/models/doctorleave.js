@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  
+
   DoctorLeave.init({
     doctorName: {
       type: DataTypes.STRING,
@@ -30,6 +30,6 @@ module.exports = (sequelize, DataTypes) => {
     modelName: 'DoctorLeave',
     tableName: 'doctor_leaves'
   });
-  
+
   return DoctorLeave;
 };

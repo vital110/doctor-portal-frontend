@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  
+
   Holiday.init({
     date: {
       type: DataTypes.DATEONLY,
@@ -26,6 +26,6 @@ module.exports = (sequelize, DataTypes) => {
     modelName: 'Holiday',
     tableName: 'holidays'
   });
-  
+
   return Holiday;
 };

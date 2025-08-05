@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const PatientDashboard = ({ onLogout, patientData }) => {
   const [showAppointmentForm, setShowAppointmentForm] = useState(false);
@@ -10,6 +10,30 @@ const PatientDashboard = ({ onLogout, patientData }) => {
     appointmentTime: '',
     reason: ''
   });
+  const [isHoliday, setIsHoliday] = useState(false);
+  const [holidayInfo, setHolidayInfo] = useState(null);
+
+  useEffect(() => {
+    if (showAppointmentForm) {
+      checkHoliday();
+    }
+  }, [showAppointmentForm]);
+
+  const checkHoliday = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/api/auth/check-holiday');
+      const result = await response.json();
+      if (result.success && result.isHoliday) {
+        setIsHoliday(true);
+        setHolidayInfo(result.holiday);
+      } else {
+        setIsHoliday(false);
+        setHolidayInfo(null);
+      }
+    } catch (error) {
+      console.error('Error checking holiday:', error);
+    }
+  };
 
   const handleAppointmentChange = (e) => {
     setAppointmentData({
@@ -151,6 +175,22 @@ const PatientDashboard = ({ onLogout, patientData }) => {
                   <p className="text-muted">Schedule your medical consultation</p>
                 </div>
 
+                {isHoliday && (
+                  <div className="alert alert-warning mb-4">
+                    <div className="d-flex align-items-center">
+                      <i className="fas fa-calendar-times fa-2x me-3 text-warning"></i>
+                      <div>
+                        <h5 className="alert-heading mb-1">Holiday Notice</h5>
+                        <p className="mb-0">
+                          <strong>Today is a holiday:</strong> {holidayInfo?.reason}
+                          <br />
+                          <small className="text-muted">Appointment booking is temporarily disabled. Please try again tomorrow.</small>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <form onSubmit={handleAppointmentSubmit}>
                   <div className="mb-3">
                     <label className="form-label fw-semibold">Doctor Name</label>
@@ -163,6 +203,7 @@ const PatientDashboard = ({ onLogout, patientData }) => {
                         name="doctorName"
                         value={appointmentData.doctorName}
                         onChange={handleAppointmentChange}
+                        disabled={isHoliday}
                         required
                       >
                         <option value="">Select Doctor</option>
@@ -187,6 +228,7 @@ const PatientDashboard = ({ onLogout, patientData }) => {
                         name="appointmentDate"
                         value={appointmentData.appointmentDate}
                         onChange={handleAppointmentChange}
+                        disabled={isHoliday}
                         required
                       />
                     </div>
@@ -203,6 +245,7 @@ const PatientDashboard = ({ onLogout, patientData }) => {
                         name="appointmentTime"
                         value={appointmentData.appointmentTime}
                         onChange={handleAppointmentChange}
+                        disabled={isHoliday}
                         required
                       >
                         <option value="">Select time</option>
@@ -230,14 +273,15 @@ const PatientDashboard = ({ onLogout, patientData }) => {
                         onChange={handleAppointmentChange}
                         placeholder="Describe your symptoms or reason for visit"
                         rows="3"
+                        disabled={isHoliday}
                         required
                       ></textarea>
                     </div>
                   </div>
 
-                  <button type="submit" className="btn btn-primary w-100 py-3">
+                  <button type="submit" className="btn btn-primary w-100 py-3" disabled={isHoliday}>
                     <i className="fas fa-calendar-plus me-2"></i>
-                    Book Appointment
+                    {isHoliday ? 'Booking Closed - Holiday' : 'Book Appointment'}
                   </button>
                 </form>
               </div>
