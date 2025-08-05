@@ -95,7 +95,7 @@ const ManagerDashboard = ({ onLogout }) => {
                     <i className="fas fa-times"></i>
                   </button>
                 </div>
-                
+
                 <div className="admin-cards">
                   {adminList.map((admin) => (
                     <div key={admin.id} className="admin-detail-card mb-3">
@@ -310,10 +310,10 @@ const ManagerDashboard = ({ onLogout }) => {
 
               <div className="row mb-4">
                 <div className="col-md-3 mb-3">
-                  <div 
+                  <div
                     className="card bg-primary text-white clickable-card"
                     onClick={handleAdminCardClick}
-                    style={{cursor: 'pointer'}}
+                    style={{ cursor: 'pointer' }}
                   >
                     <div className="card-body">
                       <div className="d-flex justify-content-between">
@@ -371,41 +371,10 @@ const ManagerDashboard = ({ onLogout }) => {
                 <div className="col-md-8">
                   <div className="card">
                     <div className="card-header">
-                      <h5 className="mb-0">Recent Appointments</h5>
+                      <h5 className="mb-0">System Overview</h5>
                     </div>
                     <div className="card-body">
-                      <div className="table-responsive">
-                        <table className="table table-hover">
-                          <thead>
-                            <tr>
-                              <th>Patient</th>
-                              <th>Doctor</th>
-                              <th>Time</th>
-                              <th>Status</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td>John Doe</td>
-                              <td>Dr. Smith</td>
-                              <td>10:00 AM</td>
-                              <td><span className="badge bg-success">Completed</span></td>
-                            </tr>
-                            <tr>
-                              <td>Jane Wilson</td>
-                              <td>Dr. Johnson</td>
-                              <td>11:30 AM</td>
-                              <td><span className="badge bg-warning">In Progress</span></td>
-                            </tr>
-                            <tr>
-                              <td>Mike Brown</td>
-                              <td>Dr. Davis</td>
-                              <td>2:00 PM</td>
-                              <td><span className="badge bg-primary">Scheduled</span></td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
+                      <p className="text-muted">Welcome to the Manager Dashboard. Use the quick actions to manage your healthcare system.</p>
                     </div>
                   </div>
                 </div>

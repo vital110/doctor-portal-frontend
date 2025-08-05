@@ -21,8 +21,8 @@ const AdminDashboard = ({ onLogout, adminData }) => {
   };
 
   const handleCheckboxChange = (appointmentId) => {
-    setSelectedAppointments(prev => 
-      prev.includes(appointmentId) 
+    setSelectedAppointments(prev =>
+      prev.includes(appointmentId)
         ? prev.filter(id => id !== appointmentId)
         : [...prev, appointmentId]
     );
@@ -44,7 +44,7 @@ const AdminDashboard = ({ onLogout, adminData }) => {
           body: JSON.stringify({ status })
         });
       }
-      
+
       alert(`${selectedAppointments.length} appointment(s) ${status}`);
       setSelectedAppointments([]);
       fetchAppointments();
@@ -109,21 +109,21 @@ const AdminDashboard = ({ onLogout, adminData }) => {
               <div className="d-flex justify-content-between align-items-center mb-4">
                 <h2>Patient Appointments ({appointments.length})</h2>
                 <div className="btn-group">
-                  <button 
+                  <button
                     className="btn btn-success btn-sm"
                     onClick={() => handleStatusUpdate('confirmed')}
                     disabled={selectedAppointments.length === 0}
                   >
                     <i className="fas fa-check me-1"></i>
-                    Confirm Selected
+                    Confirm
                   </button>
-                  <button 
+                  <button
                     className="btn btn-danger btn-sm"
                     onClick={() => handleStatusUpdate('cancelled')}
                     disabled={selectedAppointments.length === 0}
                   >
                     <i className="fas fa-times me-1"></i>
-                    Cancel Selected
+                    Cancel
                   </button>
                 </div>
               </div>
@@ -141,8 +141,8 @@ const AdminDashboard = ({ onLogout, adminData }) => {
                         <thead>
                           <tr>
                             <th width="50">
-                              <input 
-                                type="checkbox" 
+                              <input
+                                type="checkbox"
                                 onChange={(e) => {
                                   if (e.target.checked) {
                                     setSelectedAppointments(appointments.map(apt => apt.id));
@@ -165,10 +165,12 @@ const AdminDashboard = ({ onLogout, adminData }) => {
                           {appointments.map((appointment) => (
                             <tr key={appointment.id}>
                               <td>
-                                <input 
+                                <input
                                   type="checkbox"
                                   checked={selectedAppointments.includes(appointment.id)}
                                   onChange={() => handleCheckboxChange(appointment.id)}
+                                  disabled={appointment.status === 'confirmed'}   //checkbox disabled
+
                                 />
                               </td>
                               <td>
@@ -183,16 +185,15 @@ const AdminDashboard = ({ onLogout, adminData }) => {
                               <td>{appointment.appointmentTime}</td>
                               <td>
                                 <span title={appointment.reason}>
-                                  {appointment.reason.length > 50 
-                                    ? appointment.reason.substring(0, 50) + '...' 
+                                  {appointment.reason.length > 50
+                                    ? appointment.reason.substring(0, 50) + '...'
                                     : appointment.reason}
                                 </span>
                               </td>
                               <td>
-                                <span className={`badge ${
-                                  appointment.status === 'confirmed' ? 'bg-success' : 
+                                <span className={`badge ${appointment.status === 'confirmed' ? 'bg-success' :
                                   appointment.status === 'cancelled' ? 'bg-danger' : 'bg-warning'
-                                }`}>
+                                  }`}>
                                   {appointment.status.toUpperCase()}
                                 </span>
                               </td>
