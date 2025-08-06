@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const Signup = ({ onBack, onLogin }) => {
+const Signup = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
         password: '',
-        // confirmPassword: ''
     });
 
     const handleChange = (e) => {
@@ -17,11 +18,6 @@ const Signup = ({ onBack, onLogin }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        // if (formData.password !== formData.confirmPassword) {
-        //     alert('Passwords do not match');
-        //     return;
-        // }
 
         try {
             const response = await fetch('http://localhost:3001/api/auth/register-patient', {
@@ -40,7 +36,7 @@ const Signup = ({ onBack, onLogin }) => {
 
             if (response.ok && result.success) {
                 alert('Registration successful! Please login.');
-                onLogin();
+                navigate('/login');
             } else {
                 alert(result.message || 'Registration failed');
             }
@@ -48,6 +44,9 @@ const Signup = ({ onBack, onLogin }) => {
             alert('Error: ' + error.message);
         }
     };
+
+    const handleBackToHome = () => navigate('/');
+    const handleGoToLogin = () => navigate('/login');
 
     return (
         <div className="auth-container">
@@ -87,7 +86,7 @@ const Signup = ({ onBack, onLogin }) => {
                                 <div className="text-center mb-4">
                                     <button
                                         className="btn btn-link text-muted p-0 mb-3"
-                                        onClick={onBack}
+                                        onClick={handleBackToHome}
                                     >
                                         <i className="fas fa-arrow-left me-2"></i>
                                         Back to Home
@@ -151,24 +150,6 @@ const Signup = ({ onBack, onLogin }) => {
                                         </div>
                                     </div>
 
-                                    {/* <div className="mb-4">
-                                        <label className="form-label fw-semibold">Confirm Password</label>
-                                        <div className="input-group">
-                                            <span className="input-group-text bg-light border-end-0">
-                                                <i className="fas fa-lock text-muted"></i>
-                                            </span>
-                                            <input
-                                                type="password"
-                                                className="form-control border-start-0 ps-0"
-                                                name="confirmPassword"
-                                                value={formData.confirmPassword}
-                                                onChange={handleChange}
-                                                placeholder="Confirm your password"
-                                                required
-                                            />
-                                        </div>
-                                    </div> */}
-
                                     <div className="form-check mb-4">
                                         <input className="form-check-input" type="checkbox" id="terms" required />
                                         <label className="form-check-label text-muted" htmlFor="terms">
@@ -186,7 +167,7 @@ const Signup = ({ onBack, onLogin }) => {
                                             <button
                                                 type="button"
                                                 className="btn btn-link text-primary p-0 text-decoration-none"
-                                                onClick={onLogin}
+                                                onClick={handleGoToLogin}
                                             >
                                                 Sign in here
                                             </button>

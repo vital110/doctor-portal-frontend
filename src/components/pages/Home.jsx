@@ -1,17 +1,8 @@
-import React, { useState } from 'react';
-import Login from './Login';
-import Signup from './Signup';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
-    const [currentPage, setCurrentPage] = useState('home');
-
-    if (currentPage === 'login') {
-        return <Login onBack={() => setCurrentPage('home')} onSignup={() => setCurrentPage('signup')} />;
-    }
-
-    if (currentPage === 'signup') {
-        return <Signup onBack={() => setCurrentPage('home')} onLogin={() => setCurrentPage('login')} />;
-    }
+    const navigate = useNavigate();
 
     return (
         <div className="home-container">
@@ -25,19 +16,20 @@ const Home = () => {
                     <div className="d-flex gap-2">
                         <button
                             className="btn btn-outline-primary"
-                            onClick={() => setCurrentPage('login')}
+                            onClick={() => navigate('/login')}
                         >
                             Login
                         </button>
                         <button
                             className="btn btn-primary"
-                            onClick={() => setCurrentPage('signup')}
+                            onClick={() => navigate('/signup')}
                         >
                             Sign Up
                         </button>
                     </div>
                 </div>
             </nav>
+
             {/* Hero Section */}
             <section className="hero-section bg-gradient-primary text-white py-5" style={{ marginTop: '76px' }}>
                 <div className="container">

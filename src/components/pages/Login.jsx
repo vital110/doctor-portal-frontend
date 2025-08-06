@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ManagerDashboard from './ManagerDashboard';
 import AdminDashboard from './AdminDashboard';
 import PatientDashboard from './PatientDashboard';
 
-const Login = ({ onBack, onSignup }) => {
+const Login = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         email: '',
         password: ''
@@ -91,6 +93,14 @@ const Login = ({ onBack, onSignup }) => {
         setFormData({ email: '', password: '' });
     };
 
+    const handleBackToHome = (e) => {
+        e.preventDefault();
+        navigate('/');
+        setFormData({ email: '', password: '' });
+
+    }
+    const handleGoToSignup = () => navigate('/signup');
+
     // Show manager dashboard if authenticated
     if (isManager) {
         return <ManagerDashboard onLogout={handleLogout} />;
@@ -116,8 +126,9 @@ const Login = ({ onBack, onSignup }) => {
                             <div className="auth-form-container">
                                 <div className="text-center mb-4">
                                     <button
+                                        type="button"
                                         className="btn btn-link text-muted p-0 mb-3"
-                                        onClick={onBack}
+                                        onClick={handleBackToHome}
                                     >
                                         <i className="fas fa-arrow-left me-2"></i>
                                         Back to Home
@@ -185,7 +196,7 @@ const Login = ({ onBack, onSignup }) => {
                                             <button
                                                 type="button"
                                                 className="btn btn-link text-primary p-0 text-decoration-none"
-                                                onClick={onSignup}
+                                                onClick={handleGoToSignup}
                                             >
                                                 Sign up here
                                             </button>
