@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import './ManagerDashboard.css';
+import './AdminForm.css';
 
 const ManagerDashboard = ({ onLogout }) => {
   const [showAdminForm, setShowAdminForm] = useState(false);

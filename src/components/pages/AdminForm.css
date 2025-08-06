@@ -1,0 +1,431 @@
+/* ===== ADMIN FORM SYSTEM ===== */
+
+/* 1. CONTAINER & LAYOUT */
+.admin-form-container {
+  min-height: 100vh;
+  background: #f8fafc;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  padding: 2rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 2. CARD STRUCTURE */
+.admin-form-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 2.5rem;
+  border: 1px solid #e5e7eb;
+  width: 100%;
+  max-width: 500px;
+  position: relative;
+}
+
+.admin-form-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+  border-radius: 12px 12px 0 0;
+}
+
+/* 3. TYPOGRAPHY */
+.admin-form-card h2 {
+  color: #111827;
+  font-weight: 600;
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.admin-form-card p {
+  color: #6b7280;
+  font-size: 0.95rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+/* 4. NAVIGATION */
+.back-btn {
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0;
+  margin-bottom: 1.5rem;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.back-btn:hover {
+  color: #374151;
+}
+
+.back-btn i {
+  margin-right: 0.5rem;
+}
+
+/* 5. FORM ELEMENTS */
+.admin-form-card .form-label {
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+/* 5.1 INPUT GROUPS */
+.admin-form-card .input-group {
+  margin-bottom: 1.5rem;
+}
+
+.admin-form-card .input-group-text {
+  background: #f9fafb;
+  border: 1px solid #d1d5db;
+  border-right: none;
+  border-radius: 8px 0 0 8px;
+  color: #6b7280;
+  padding: 0.75rem 1rem;
+}
+
+.admin-form-card .form-control {
+  border: 1px solid #d1d5db;
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: #374151;
+  background: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.admin-form-card .form-control:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  outline: none;
+}
+
+.admin-form-card .input-group:focus-within .input-group-text {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  color: #3b82f6;
+}
+
+/* 5.2 UTILITY CLASSES */
+.admin-form-card .border-start-0 {
+  border-left: none !important;
+}
+
+.admin-form-card .border-end-0 {
+  border-right: none !important;
+}
+
+.admin-form-card .ps-0 {
+  padding-left: 0 !important;
+}
+
+/* 6. ROLE SELECTION SYSTEM */
+.role-selection {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.role-btn {
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1rem 0.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.role-btn:hover {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  color: #3b82f6;
+}
+
+.role-btn.active {
+  border-color: #3b82f6;
+  background: #3b82f6;
+  color: #ffffff;
+}
+
+.role-btn i {
+  display: block;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* 7. ACTION BUTTONS */
+.submit-btn {
+  width: 100%;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.875rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.submit-btn:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
+}
+
+.submit-btn i {
+  margin-right: 0.5rem;
+}
+
+/* ===== APPOINTMENT FILTER SYSTEM ===== */
+
+/* 8. FILTER CONTAINER */
+.appointment-filter-container {
+  min-height: 100vh;
+  background: #f8fafc;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  padding: 2rem 0;
+}
+
+/* 8.1 FILTER FORM ELEMENTS */
+.appointment-filter-container .admin-form-card {
+  max-width: 450px;
+}
+
+.appointment-filter-container .form-control {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: #374151;
+  background: #ffffff;
+  transition: border-color 0.2s;
+}
+
+.appointment-filter-container .form-control:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  outline: none;
+}
+
+.appointment-filter-container select.form-control {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.75rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+/* 8.2 FILTER ACTIONS & ALERTS */
+.appointment-filter-container .btn-primary {
+  background: #3b82f6;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  padding: 0.875rem 1.5rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.appointment-filter-container .btn-primary:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.appointment-filter-container .alert-success {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.appointment-filter-container .alert-success h4 {
+  color: #047857;
+  font-weight: 600;
+}
+
+/* ===== ADMIN LIST SYSTEM ===== */
+
+/* 9. LIST CONTAINER */
+.admin-list-container {
+  min-height: 100vh;
+  background: #f8fafc;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  padding: 2rem 0;
+}
+
+/* 9.1 LIST CARD STRUCTURE */
+.admin-list-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 2rem;
+  border: 1px solid #e5e7eb;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.admin-list-card h3 {
+  color: #111827;
+  font-weight: 600;
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.admin-list-card .btn-outline-secondary {
+  background: none;
+  border: 1px solid #d1d5db;
+  color: #6b7280;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  transition: all 0.2s;
+}
+
+.admin-list-card .btn-outline-secondary:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+  color: #374151;
+}
+
+/* 9.2 ADMIN DETAIL CARDS */
+.admin-detail-card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.admin-detail-card:hover {
+  background: #f3f4f6;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.admin-avatar {
+  width: 60px;
+  height: 60px;
+  background: #eff6ff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.admin-info h5 {
+  color: #111827;
+  font-weight: 600;
+  font-size: 1.125rem;
+  margin-bottom: 0.5rem;
+}
+
+.admin-info p {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.admin-info .badge {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+}
+
+.admin-info .bg-primary {
+  background-color: #3b82f6 !important;
+}
+
+.admin-info .bg-success {
+  background-color: #10b981 !important;
+}
+
+.admin-info .bg-info {
+  background-color: #06b6d4 !important;
+}
+
+/* ===== RESPONSIVE SYSTEM ===== */
+
+/* 10. TABLET BREAKPOINT */
+@media (max-width: 768px) {
+  .admin-form-container,
+  .appointment-filter-container,
+  .admin-list-container {
+    padding: 1rem;
+  }
+
+  .admin-form-card,
+  .admin-list-card {
+    padding: 1.5rem;
+    margin: 0 0.5rem;
+  }
+
+  .admin-form-card h2 {
+    font-size: 1.5rem;
+  }
+
+  .role-selection {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .role-btn {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .admin-detail-card {
+    padding: 1rem;
+  }
+}
+
+/* 11. MOBILE BREAKPOINT */
+@media (max-width: 576px) {
+  .admin-form-card,
+  .admin-list-card {
+    padding: 1rem;
+  }
+
+  .admin-form-card h2 {
+    font-size: 1.375rem;
+  }
+
+  .role-btn i {
+    font-size: 1.25rem;
+  }
+}
+
+/* ===== ACCESSIBILITY SYSTEM ===== */
+
+/* 12. FOCUS MANAGEMENT */
+.admin-form-container *:focus,
+.appointment-filter-container *:focus,
+.admin-list-container *:focus {
+  outline: none;
+}
+
+/* ===== END ADMIN FORM SYSTEM ===== */

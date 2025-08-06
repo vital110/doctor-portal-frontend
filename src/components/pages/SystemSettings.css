@@ -1,0 +1,335 @@
+/* Clean Professional System Settings */
+.system-settings-container {
+  min-height: 100vh;
+  background: #f8fafc;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  padding: 2rem 0;
+}
+
+.system-settings-header {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem 2rem;
+  margin-bottom: 2rem;
+  border: 1px solid #e5e7eb;
+}
+
+.system-settings-header h2 {
+  color: #111827;
+  font-weight: 600;
+  font-size: 1.875rem;
+  margin: 0;
+}
+
+.system-settings-header h2 i {
+  color: #3b82f6;
+  margin-right: 0.5rem;
+}
+
+.system-settings-header .btn-secondary {
+  position: absolute;
+  down: 1rem;
+  margin-right: 2rem;
+  right: 1rem;
+  color: #6b7280;
+  text-decoration: none;
+  font-size: 1.5rem;
+  transition: color 0.2s ease;
+  padding: 0;
+  background: none;
+  border: none;
+}
+
+/* .system-settings-header .btn-secondary:hover {
+  background: #4b5563;
+} */
+
+.settings-card {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  margin-bottom: 2rem;
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+
+.settings-card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.settings-card .card-header {
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 1rem 1.5rem;
+}
+
+.settings-card .card-header h5 {
+  color: #111827;
+  font-weight: 600;
+  font-size: 1.125rem;
+  margin: 0;
+}
+
+.settings-card .card-header h5 i {
+  color: #3b82f6;
+  margin-right: 0.5rem;
+}
+
+.settings-card .card-body {
+  padding: 1.5rem;
+}
+
+.working-hours-row {
+  display: grid;
+  grid-template-columns: 100px 80px 1fr auto 1fr;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.working-hours-row:last-child {
+  border-bottom: none;
+}
+
+.day-label {
+  color: #374151;
+  font-weight: 500;
+  font-size: 0.875rem;
+  text-transform: capitalize;
+}
+
+.form-check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-check-input {
+  width: 16px;
+  height: 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 3px;
+}
+
+.form-check-input:checked {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.form-check-label {
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+.form-control {
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: #374151;
+  background: #ffffff;
+  transition: border-color 0.2s;
+}
+
+.form-control:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  outline: none;
+}
+
+.form-control:hover {
+  border-color: #9ca3af;
+}
+
+.form-label {
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.btn-success {
+  background: #10b981;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  transition: background-color 0.2s;
+  color: white;
+  font-size: 0.875rem;
+}
+
+.btn-success:hover {
+  background: #059669;
+}
+
+.btn-primary {
+  background: #3b82f6;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  transition: background-color 0.2s;
+  color: white;
+  font-size: 0.875rem;
+}
+
+.btn-primary:hover {
+  background: #2563eb;
+}
+
+.btn-warning {
+  background: #f59e0b;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  transition: background-color 0.2s;
+  color: white;
+  font-size: 0.875rem;
+}
+
+.btn-warning:hover {
+  background: #d97706;
+}
+
+.btn-danger {
+  background: #ef4444;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  transition: background-color 0.2s;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+}
+
+.holiday-list,
+.leave-list {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.holiday-list::-webkit-scrollbar,
+.leave-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.holiday-list::-webkit-scrollbar-track,
+.leave-list::-webkit-scrollbar-track {
+  background: #f3f4f6;
+}
+
+.holiday-list::-webkit-scrollbar-thumb,
+.leave-list::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 2px;
+}
+
+.holiday-list::-webkit-scrollbar-thumb:hover,
+.leave-list::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+.list-item {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.list-item:hover {
+  background: #f3f4f6;
+}
+
+.list-item strong {
+  color: #111827;
+  font-weight: 500;
+}
+
+.list-item small {
+  color: #6b7280;
+  font-size: 0.75rem;
+}
+
+.text-center-divider {
+  color: #6b7280;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .system-settings-container {
+    padding: 1rem;
+  }
+
+  .system-settings-header {
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .system-settings-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .working-hours-row {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    text-align: left;
+  }
+
+  .settings-card .card-body {
+    padding: 1rem;
+  }
+
+  .btn-primary,
+  .btn-success,
+  .btn-warning {
+    padding: 0.875rem 1.25rem;
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .system-settings-header {
+    padding: 1rem;
+  }
+
+  .system-settings-header .d-flex {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .settings-card .card-header {
+    padding: 1rem;
+  }
+
+  .settings-card .card-body {
+    padding: 0.75rem;
+  }
+}
+
+/* Focus Management */
+.system-settings-container *:focus {
+  outline: none;
+}
+
+/* Focus Management */
+.system-settings-container *:focus {
+  outline: none;
+}
