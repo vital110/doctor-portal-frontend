@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const { Admin, Patient, Appointment, ClinicSetting, Holiday, DoctorLeave } = require('../models');
 const { Op } = require('sequelize');
+const { adminRegistrationSchema, patientRegistrationSchema, loginSchema, appointmentSchema } = require('../validators/authValidators');
 const router = express.Router();
 
 // Auto cleanup function - delete old appointments
@@ -30,11 +31,16 @@ setInterval(cleanupOldAppointments, 60 * 60 * 1000);
 // Register new admin
 router.post('/register-admin', async (req, res) => {
   try {
-    const { fullName, email, password, role } = req.body;
-
-    if (!fullName || !email || !password || !role) {
-      return res.status(400).json({ message: 'All fields are required' });
+    const { error, value } = adminRegistrationSchema.validate(req.body);
+    
+    if (error) {
+      return res.status(400).json({ 
+        success: false,
+        message: error.details[0].message 
+      });
     }
+
+    const { fullName, email, password, role } = value;
 
     const existingAdmin = await Admin.findOne({ where: { email } });
     if (existingAdmin) {
@@ -73,11 +79,16 @@ router.post('/register-admin', async (req, res) => {
 // Login admin
 router.post('/login-admin', async (req, res) => {
   try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ message: 'Email and password are required' });
+    const { error, value } = loginSchema.validate(req.body);
+    
+    if (error) {
+      return res.status(400).json({ 
+        success: false,
+        message: error.details[0].message 
+      });
     }
+
+    const { email, password } = value;
 
     const admin = await Admin.findOne({ where: { email } });
     if (!admin) {
@@ -118,11 +129,16 @@ router.post('/login-admin', async (req, res) => {
 // Register patient
 router.post('/register-patient', async (req, res) => {
   try {
-    const { fullName, email, password } = req.body;
-
-    if (!fullName || !email || !password) {
-      return res.status(400).json({ message: 'All fields are required' });
+    const { error, value } = patientRegistrationSchema.validate(req.body);
+    
+    if (error) {
+      return res.status(400).json({ 
+        success: false,
+        message: error.details[0].message 
+      });
     }
+
+    const { fullName, email, password } = value;
 
     const existingPatient = await Patient.findOne({ where: { email } });
     if (existingPatient) {
@@ -159,11 +175,16 @@ router.post('/register-patient', async (req, res) => {
 // Login patient
 router.post('/login-patient', async (req, res) => {
   try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ message: 'Email and password are required' });
+    const { error, value } = loginSchema.validate(req.body);
+    
+    if (error) {
+      return res.status(400).json({ 
+        success: false,
+        message: error.details[0].message 
+      });
     }
+
+    const { email, password } = value;
 
     const patient = await Patient.findOne({ where: { email } });
     if (!patient) {
@@ -203,11 +224,16 @@ router.post('/login-patient', async (req, res) => {
 // Book appointment
 router.post('/book-appointment', async (req, res) => {
   try {
-    const { patientId, doctorName, appointmentDate, appointmentTime, reason } = req.body;
-
-    if (!patientId || !doctorName || !appointmentDate || !appointmentTime || !reason) {
-      return res.status(400).json({ message: 'All fields are required' });
+    const { error, value } = appointmentSchema.validate(req.body);
+    
+    if (error) {
+      return res.status(400).json({ 
+        success: false,
+        message: error.details[0].message 
+      });
     }
+
+    const { patientId, doctorName, appointmentDate, appointmentTime, reason } = value;
 
     // Check if doctor is on leave on the appointment date
     const doctorLeave = await DoctorLeave.findOne({

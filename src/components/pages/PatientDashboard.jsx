@@ -84,7 +84,7 @@ const PatientDashboard = ({ onLogout, patientData }) => {
     try {
       const response = await fetch(`http://localhost:3001/api/auth/patient-appointments/${patientData.id}`);
       const result = await response.json();
-      
+
       if (result.success) {
         setAppointments(result.appointments);
         setShowAppointments(true);
@@ -110,7 +110,7 @@ const PatientDashboard = ({ onLogout, patientData }) => {
                     <i className="fas fa-times"></i>
                   </button>
                 </div>
-                
+
                 <div className="appointments-list">
                   {appointments.length === 0 ? (
                     <div className="text-center py-5">
@@ -136,10 +136,9 @@ const PatientDashboard = ({ onLogout, patientData }) => {
                             <p className="text-muted mb-1">{appointment.reason}</p>
                           </div>
                           <div className="col-md-3 text-end">
-                            <span className={`badge ${
-                              appointment.status === 'confirmed' ? 'bg-success' : 
+                            <span className={`badge ${appointment.status === 'confirmed' ? 'bg-success' :
                               appointment.status === 'cancelled' ? 'bg-danger' : 'bg-warning'
-                            }`}>
+                              }`}>
                               {appointment.status.toUpperCase()}
                             </span>
                           </div>
@@ -228,6 +227,7 @@ const PatientDashboard = ({ onLogout, patientData }) => {
                         name="appointmentDate"
                         value={appointmentData.appointmentDate}
                         onChange={handleAppointmentChange}
+                        min={new Date().toISOString().split('T')[0]}
                         disabled={isHoliday}
                         required
                       />
@@ -352,7 +352,7 @@ const PatientDashboard = ({ onLogout, patientData }) => {
           <div className="col-md-9 col-lg-10 main-content">
             <div className="p-4">
               <h2 className="mb-4">Welcome, {patientData?.fullName}</h2>
-              
+
               <div className="row mb-4">
                 <div className="col-md-6 mb-3">
                   <div className="card bg-info text-white">
@@ -379,7 +379,7 @@ const PatientDashboard = ({ onLogout, patientData }) => {
                 <div className="card-body">
                   <div className="row">
                     <div className="col-md-3 mb-3">
-                      <button 
+                      <button
                         className="btn btn-primary w-100"
                         onClick={() => setShowAppointmentForm(true)}
                       >
@@ -388,7 +388,7 @@ const PatientDashboard = ({ onLogout, patientData }) => {
                       </button>
                     </div>
                     <div className="col-md-3 mb-3">
-                      <button 
+                      <button
                         className="btn btn-success w-100"
                         onClick={fetchAppointments}
                       >
