@@ -1,4 +1,4 @@
-/* Professional Upload Medical Record Styles */
+/* Professional Upload Medical Record Styles - Horizontal Layout */
 .upload-medical-record-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
@@ -14,6 +14,8 @@
   border: 1px solid #e5e7eb;
   position: relative;
   overflow: hidden;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .upload-form-card::before {
@@ -41,6 +43,29 @@
   color: #6b7280;
   font-size: 0.95rem;
   margin-bottom: 0;
+}
+
+/* Horizontal Form Layout */
+.upload-form-card form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem 2rem;
+  align-items: start;
+}
+
+.upload-form-card .mb-3,
+.upload-form-card .mb-4 {
+  margin-bottom: 0;
+}
+
+.upload-form-card .mb-4:last-of-type {
+  grid-column: 1 / -1;
+}
+
+.upload-form-card .btn-primary {
+  grid-column: 1 / -1;
+  justify-self: center;
+  max-width: 300px;
 }
 
 /* Form Elements */
@@ -153,11 +178,16 @@
 
 /* Back Button */
 .upload-form-card .btn-link {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
   color: #6b7280;
   text-decoration: none;
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-size: 1.5rem;
   transition: color 0.2s ease;
+  padding: 0;
+  background: none;
+  border: none;
 }
 
 .upload-form-card .btn-link:hover {
@@ -166,7 +196,7 @@
 }
 
 .upload-form-card .btn-link i {
-  margin-right: 0.5rem;
+  margin: 0;
 }
 
 /* Spinner */
@@ -174,15 +204,6 @@
   width: 1rem;
   height: 1rem;
   border-width: 0.125rem;
-}
-
-/* Form Groups */
-.upload-form-card .mb-3 {
-  margin-bottom: 1.5rem;
-}
-
-.upload-form-card .mb-4 {
-  margin-bottom: 2rem;
 }
 
 /* Required Field Indicator */
@@ -212,16 +233,21 @@
   .upload-medical-record-container {
     padding: 1rem;
   }
-  
+
   .upload-form-card {
     padding: 1.5rem;
     margin: 0 0.5rem;
   }
-  
+
+  .upload-form-card form {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
   .upload-form-card h2 {
     font-size: 1.5rem;
   }
-  
+
   .upload-form-card .btn-primary {
     padding: 1rem 1.5rem;
     font-size: 0.9rem;
@@ -232,11 +258,11 @@
   .upload-form-card {
     padding: 1.25rem;
   }
-  
+
   .upload-form-card h2 {
     font-size: 1.375rem;
   }
-  
+
   .upload-form-card .form-control {
     padding: 0.625rem 0.875rem;
   }

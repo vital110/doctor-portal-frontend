@@ -20,7 +20,7 @@ const UploadMedicalRecord = ({ onBack, adminData }) => {
     try {
       const response = await fetch('http://localhost:3001/api/auth/all-patients');
       const result = await response.json();
-      
+
       if (result.success) {
         setPatients(result.patients);
       }
@@ -45,7 +45,7 @@ const UploadMedicalRecord = ({ onBack, adminData }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.patientId || !formData.recordType || !formData.title || !formData.file) {
       alert('Please fill all required fields and select a PDF file');
       return;
@@ -103,7 +103,7 @@ const UploadMedicalRecord = ({ onBack, adminData }) => {
             <div className="upload-form-card">
               <div className="text-center mb-4">
                 <button className="btn btn-link text-muted p-0 mb-3" onClick={onBack}>
-                  <i className="fas fa-arrow-left me-2"></i>Back to Dashboard
+                  <i className="fas fa-arrow-left me-2"></i>
                 </button>
                 <h2><i className="fas fa-cloud-upload-alt me-2"></i>Upload Medical Record</h2>
                 <p className="text-muted">Upload patient medical documents (PDF only)</p>
@@ -184,8 +184,8 @@ const UploadMedicalRecord = ({ onBack, adminData }) => {
                   <small className="text-muted">Only PDF files are allowed (Max: 10MB)</small>
                 </div>
 
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   className="btn btn-primary w-100 py-3"
                   disabled={uploading}
                 >
