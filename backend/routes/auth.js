@@ -1,9 +1,41 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
-const { Admin, Patient, Appointment, ClinicSetting, Holiday, DoctorLeave } = require('../models');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+const { Admin, Patient, Appointment, ClinicSetting, Holiday, DoctorLeave, MedicalRecord } = require('../models');
 const { Op } = require('sequelize');
 const { adminRegistrationSchema, patientRegistrationSchema, loginSchema, appointmentSchema } = require('../validators/authValidators');
 const router = express.Router();
+
+// Multer configuration for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadPath = path.join(__dirname, '../uploads/medical-records');
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === 'application/pdf') {
+      cb(null, true);
+    } else {
+      cb(new Error('Only PDF files are allowed'), false);
+    }
+  }
+});
 
 // Auto cleanup function - delete old appointments
 const cleanupOldAppointments = async () => {
@@ -763,6 +795,135 @@ router.get('/check-doctor-leave', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error checking doctor leave',
+      error: error.message
+    });
+  }
+});
+
+// Upload medical record
+router.post('/upload-medical-record', upload.single('medicalFile'), async (req, res) => {
+  try {
+    const { patientId, recordType, title, description, uploadedBy } = req.body;
+    
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please select a PDF file to upload'
+      });
+    }
+    
+    if (!patientId || !recordType || !title || !uploadedBy) {
+      return res.status(400).json({
+        success: false,
+        message: 'Patient ID, record type, title, and uploader name are required'
+      });
+    }
+    
+    const medicalRecord = await MedicalRecord.create({
+      patientId: parseInt(patientId),
+      recordType,
+      title,
+      description: description || '',
+      fileName: req.file.originalname,
+      filePath: req.file.path,
+      fileSize: req.file.size,
+      uploadedBy
+    });
+    
+    res.json({
+      success: true,
+      message: 'Medical record uploaded successfully',
+      record: {
+        id: medicalRecord.id,
+        title: medicalRecord.title,
+        recordType: medicalRecord.recordType,
+        fileName: medicalRecord.fileName,
+        uploadedAt: medicalRecord.createdAt
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error uploading medical record',
+      error: error.message
+    });
+  }
+});
+
+// Get patient medical records
+router.get('/patient-medical-records/:patientId', async (req, res) => {
+  try {
+    const { patientId } = req.params;
+    
+    const records = await MedicalRecord.findAll({
+      where: { patientId },
+      order: [['createdAt', 'DESC']]
+    });
+    
+    res.json({
+      success: true,
+      records: records
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching medical records',
+      error: error.message
+    });
+  }
+});
+
+// Download medical record
+router.get('/download-medical-record/:recordId', async (req, res) => {
+  try {
+    const { recordId } = req.params;
+    
+    const record = await MedicalRecord.findByPk(recordId);
+    
+    if (!record) {
+      return res.status(404).json({
+        success: false,
+        message: 'Medical record not found'
+      });
+    }
+    
+    if (!fs.existsSync(record.filePath)) {
+      return res.status(404).json({
+        success: false,
+        message: 'File not found on server'
+      });
+    }
+    
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${record.fileName}"`);
+    
+    const fileStream = fs.createReadStream(record.filePath);
+    fileStream.pipe(res);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error downloading medical record',
+      error: error.message
+    });
+  }
+});
+
+// Get all patients for admin
+router.get('/all-patients', async (req, res) => {
+  try {
+    const patients = await Patient.findAll({
+      attributes: ['id', 'fullName', 'email', 'createdAt'],
+      order: [['fullName', 'ASC']]
+    });
+    
+    res.json({
+      success: true,
+      patients: patients
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching patients',
       error: error.message
     });
   }

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import MedicalRecords from './MedicalRecords';
 
 const PatientDashboard = ({ onLogout, patientData }) => {
   const [showAppointmentForm, setShowAppointmentForm] = useState(false);
   const [showAppointments, setShowAppointments] = useState(false);
+  const [showMedicalRecords, setShowMedicalRecords] = useState(false);
   const [appointments, setAppointments] = useState([]);
   const [appointmentData, setAppointmentData] = useState({
     doctorName: '',
@@ -93,6 +95,10 @@ const PatientDashboard = ({ onLogout, patientData }) => {
       alert('Error fetching appointments: ' + error.message);
     }
   };
+
+  if (showMedicalRecords) {
+    return <MedicalRecords onBack={() => setShowMedicalRecords(false)} patientData={patientData} />;
+  }
 
   if (showAppointments) {
     return (
@@ -334,7 +340,7 @@ const PatientDashboard = ({ onLogout, patientData }) => {
                   </a>
                 </li>
                 <li className="nav-item mb-2">
-                  <a className="nav-link" href="#">
+                  <a className="nav-link" href="#" onClick={() => setShowMedicalRecords(true)}>
                     <i className="fas fa-file-medical me-2"></i>
                     Medical Records
                   </a>
@@ -397,9 +403,12 @@ const PatientDashboard = ({ onLogout, patientData }) => {
                       </button>
                     </div>
                     <div className="col-md-3 mb-3">
-                      <button className="btn btn-warning w-100">
-                        <i className="fas fa-user-md me-2"></i>
-                        Find Doctors
+                      <button 
+                        className="btn btn-warning w-100"
+                        onClick={() => setShowMedicalRecords(true)}
+                      >
+                        <i className="fas fa-file-medical me-2"></i>
+                        Medical Records
                       </button>
                     </div>
                     <div className="col-md-3 mb-3">

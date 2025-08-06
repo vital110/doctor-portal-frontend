@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import SystemSettings from './SystemSettings';
+import UploadMedicalRecord from './UploadMedicalRecord';
 
 const AdminDashboard = ({ onLogout, adminData }) => {
   const [appointments, setAppointments] = useState([]);
@@ -7,6 +8,7 @@ const AdminDashboard = ({ onLogout, adminData }) => {
   const [currentDate, setCurrentDate] = useState('');
   const [showPreviousFilter, setShowPreviousFilter] = useState(false);
   const [showSystemSettings, setShowSystemSettings] = useState(false);
+  const [showUploadMedical, setShowUploadMedical] = useState(false);
   const [filterData, setFilterData] = useState({
     year: '',
     month: '',
@@ -101,6 +103,10 @@ const AdminDashboard = ({ onLogout, adminData }) => {
     }
     fetchPreviousAppointments();
   };
+
+  if (showUploadMedical) {
+    return <UploadMedicalRecord onBack={() => setShowUploadMedical(false)} adminData={adminData} />;
+  }
 
   if (showSystemSettings) {
     return <SystemSettings onBack={() => setShowSystemSettings(false)} />;
@@ -283,6 +289,12 @@ const AdminDashboard = ({ onLogout, adminData }) => {
                   </a>
                 </li>
                 <li className="nav-item mb-2">
+                  <a className="nav-link" href="#" onClick={() => setShowUploadMedical(true)}>
+                    <i className="fas fa-cloud-upload-alt me-2"></i>
+                    Upload Medical Record
+                  </a>
+                </li>
+                <li className="nav-item mb-2">
                   <a className="nav-link" href="#">
                     <i className="fas fa-users-cog me-2"></i>
                     User Management
@@ -365,6 +377,7 @@ const AdminDashboard = ({ onLogout, adminData }) => {
                                 checked={selectedAppointments.length === appointments.length && appointments.length > 0}
                               />
                             </th>
+                            <th>Date</th>
                             <th>Time</th>
                             <th>Patient Name</th>
                             <th>Doctor</th>
@@ -383,6 +396,7 @@ const AdminDashboard = ({ onLogout, adminData }) => {
                                   disabled={appointment.status === 'confirmed'}
                                 />
                               </td>
+                              <td>{new Date(appointment.appointmentDate).toLocaleDateString()}</td>
                               <td>
                                 <strong>{appointment.appointmentTime}</strong>
                               </td>
