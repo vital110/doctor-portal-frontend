@@ -1,0 +1,274 @@
+/* Professional Upload Medical Record Styles */
+.upload-medical-record-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  padding: 2rem 0;
+}
+
+.upload-form-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 2.5rem;
+  border: 1px solid #e5e7eb;
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-form-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+}
+
+.upload-form-card h2 {
+  color: #1f2937;
+  font-weight: 600;
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.upload-form-card h2 i {
+  color: #3b82f6;
+}
+
+.upload-form-card p {
+  color: #6b7280;
+  font-size: 0.95rem;
+  margin-bottom: 0;
+}
+
+/* Form Elements */
+.upload-form-card .form-label {
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.upload-form-card .form-control {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: #374151;
+  background-color: #ffffff;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.upload-form-card .form-control:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  outline: none;
+}
+
+.upload-form-card .form-control:hover {
+  border-color: #9ca3af;
+}
+
+.upload-form-card select.form-control {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.75rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+.upload-form-card textarea.form-control {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* File Input Styling */
+.upload-form-card input[type="file"] {
+  padding: 0.75rem;
+  border: 2px dashed #d1d5db;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.upload-form-card input[type="file"]:hover {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+}
+
+.upload-form-card input[type="file"]:focus {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+  outline: none;
+}
+
+/* Small Text */
+.upload-form-card small {
+  color: #6b7280;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+/* Submit Button */
+.upload-form-card .btn-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.875rem 1.5rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-form-card .btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.upload-form-card .btn-primary:active {
+  transform: translateY(0);
+}
+
+.upload-form-card .btn-primary:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.upload-form-card .btn-primary i {
+  margin-right: 0.5rem;
+}
+
+/* Back Button */
+.upload-form-card .btn-link {
+  color: #6b7280;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.upload-form-card .btn-link:hover {
+  color: #374151;
+  text-decoration: none;
+}
+
+.upload-form-card .btn-link i {
+  margin-right: 0.5rem;
+}
+
+/* Spinner */
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.125rem;
+}
+
+/* Form Groups */
+.upload-form-card .mb-3 {
+  margin-bottom: 1.5rem;
+}
+
+.upload-form-card .mb-4 {
+  margin-bottom: 2rem;
+}
+
+/* Required Field Indicator */
+.upload-form-card .form-label::after {
+  content: '';
+}
+
+.upload-form-card .form-label:has(+ .form-control[required])::after,
+.upload-form-card .form-label:has(+ select[required])::after,
+.upload-form-card .form-label:has(+ input[required])::after {
+  content: ' *';
+  color: #ef4444;
+  font-weight: 600;
+}
+
+/* Validation States */
+.upload-form-card .form-control:invalid {
+  border-color: #ef4444;
+}
+
+.upload-form-card .form-control:valid {
+  border-color: #10b981;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .upload-medical-record-container {
+    padding: 1rem;
+  }
+  
+  .upload-form-card {
+    padding: 1.5rem;
+    margin: 0 0.5rem;
+  }
+  
+  .upload-form-card h2 {
+    font-size: 1.5rem;
+  }
+  
+  .upload-form-card .btn-primary {
+    padding: 1rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .upload-form-card {
+    padding: 1.25rem;
+  }
+  
+  .upload-form-card h2 {
+    font-size: 1.375rem;
+  }
+  
+  .upload-form-card .form-control {
+    padding: 0.625rem 0.875rem;
+  }
+}
+
+/* Focus Management */
+.upload-form-card *:focus {
+  outline: none;
+}
+
+/* Professional Hover Effects */
+.upload-form-card {
+  transition: box-shadow 0.3s ease;
+}
+
+.upload-form-card:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Loading State */
+.upload-form-card.uploading {
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.upload-form-card.uploading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  z-index: 10;
+}

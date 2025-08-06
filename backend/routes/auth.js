@@ -382,20 +382,42 @@ router.get('/admin-appointments-by-date', async (req, res) => {
     let whereClause = {};
     let filterDescription = '';
 
+    // Get today's date for exclusion
+    const today = new Date();
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+
     if (year && month && date) {
-      // Specific date
+      // Specific date - exclude if it's today
       const startDate = new Date(year, month - 1, date);
       const endDate = new Date(year, month - 1, date, 23, 59, 59);
+      
+      // Check if the requested date is today
+      const isToday = startDate.getTime() >= todayStart.getTime() && startDate.getTime() <= todayEnd.getTime();
+      
+      if (isToday) {
+        // Return empty result if requesting today's date
+        return res.json({
+          success: true,
+          appointments: [],
+          filter: `${date}/${month}/${year} (Today's appointments are not shown in previous appointments)`,
+          count: 0
+        });
+      }
+      
       whereClause.appointmentDate = {
         [Op.between]: [startDate, endDate]
       };
       filterDescription = `${date}/${month}/${year}`;
     } else if (year && month) {
-      // Specific month
+      // Specific month - exclude today's appointments
       const startDate = new Date(year, month - 1, 1);
       const endDate = new Date(year, month, 0, 23, 59, 59);
       whereClause.appointmentDate = {
-        [Op.between]: [startDate, endDate]
+        [Op.and]: [
+          { [Op.between]: [startDate, endDate] },
+          { [Op.lt]: todayStart }
+        ]
       };
       filterDescription = `${new Date(0, month - 1).toLocaleString('default', { month: 'long' })} ${year}`;
     }

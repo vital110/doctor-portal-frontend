@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ManagerDashboard from './ManagerDashboard';
 import AdminDashboard from './AdminDashboard';
@@ -16,6 +16,23 @@ const Login = () => {
     const [isPatient, setIsPatient] = useState(false);
     const [adminData, setAdminData] = useState(null);
     const [patientData, setPatientData] = useState(null);
+
+    // Check for existing authentication on component mount
+    useEffect(() => {
+        const authData = localStorage.getItem('authData');
+        if (authData) {
+            const { userType, userData } = JSON.parse(authData);
+            if (userType === 'manager') {
+                setIsManager(true);
+            } else if (userType === 'admin') {
+                setIsAdmin(true);
+                setAdminData(userData);
+            } else if (userType === 'patient') {
+                setIsPatient(true);
+                setPatientData(userData);
+            }
+        }
+    }, []);
 
     // Default manager credentials
     const MANAGER_CREDENTIALS = {
@@ -37,6 +54,7 @@ const Login = () => {
         if (formData.email === MANAGER_CREDENTIALS.email &&
             formData.password === MANAGER_CREDENTIALS.password) {
             setIsManager(true);
+            localStorage.setItem('authData', JSON.stringify({ userType: 'manager' }));
             return;
         }
 
@@ -55,6 +73,10 @@ const Login = () => {
             if (adminResponse.ok && adminResult.success) {
                 setIsAdmin(true);
                 setAdminData(adminResult.admin);
+                localStorage.setItem('authData', JSON.stringify({ 
+                    userType: 'admin', 
+                    userData: adminResult.admin 
+                }));
                 return;
             }
         } catch (error) {
@@ -76,6 +98,10 @@ const Login = () => {
             if (patientResponse.ok && patientResult.success) {
                 setIsPatient(true);
                 setPatientData(patientResult.patient);
+                localStorage.setItem('authData', JSON.stringify({ 
+                    userType: 'patient', 
+                    userData: patientResult.patient 
+                }));
                 return;
             }
         } catch (error) {
@@ -92,6 +118,7 @@ const Login = () => {
         setAdminData(null);
         setPatientData(null);
         setFormData({ email: '', password: '' });
+        localStorage.removeItem('authData');
     };
 
     const handleBackToHome = (e) => {
