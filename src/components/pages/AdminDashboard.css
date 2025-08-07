@@ -1,0 +1,374 @@
+/* Professional Admin Dashboard Styles */
+.admin-dashboard {
+  min-height: 100vh;
+  background-color: #f8fafc;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+/* Navbar */
+.admin-dashboard .navbar {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  padding: 1rem 0;
+}
+
+.admin-dashboard .navbar-brand {
+  font-weight: 600;
+  font-size: 1.125rem;
+  color: #1f2937 !important;
+}
+
+/* Sidebar */
+.admin-dashboard .sidebar {
+  background-color: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  min-height: calc(100vh - 73px);
+}
+
+.admin-dashboard .sidebar .nav-link {
+  color: #6b7280;
+  padding: 0.75rem 1rem;
+  margin: 0.125rem 0.5rem;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.15s ease;
+}
+
+.admin-dashboard .sidebar .nav-link:hover {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.admin-dashboard .sidebar .nav-link.active {
+  background-color: #3b82f6;
+  color: #ffffff;
+}
+
+.admin-dashboard .sidebar .nav-link i {
+  margin-right: 0.75rem;
+  width: 1rem;
+  text-align: center;
+}
+
+/* Main Content */
+.admin-dashboard .main-content {
+  padding: 1.5rem;
+  background-color: #f8fafc;
+}
+
+/* Cards */
+.admin-dashboard .card {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.15s ease;
+}
+
+.admin-dashboard .card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.admin-dashboard .card-body {
+  padding: 1.5rem;
+}
+
+/* Tables */
+.admin-dashboard .table-responsive {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+}
+
+.admin-dashboard .table {
+  margin-bottom: 0;
+  background-color: #ffffff;
+}
+
+.admin-dashboard .table thead th {
+  background-color: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  border-top: none;
+  color: #374151;
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: 0.75rem;
+  text-transform: none;
+}
+
+.admin-dashboard .table tbody tr {
+  border-bottom: 1px solid #f3f4f6;
+  transition: background-color 0.15s ease;
+}
+
+.admin-dashboard .table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+.admin-dashboard .table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.admin-dashboard .table tbody td {
+  padding: 0.75rem;
+  border-top: none;
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+/* Buttons */
+.admin-dashboard .btn-group {
+  gap: 0.5rem;
+}
+
+.admin-dashboard .btn {
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.admin-dashboard .btn-success {
+  background-color: #10b981;
+  border-color: #10b981;
+  color: #ffffff;
+}
+
+.admin-dashboard .btn-success:hover {
+  background-color: #059669;
+  border-color: #059669;
+}
+
+.admin-dashboard .btn-danger {
+  background-color: #ef4444;
+  border-color: #ef4444;
+  color: #ffffff;
+}
+
+.admin-dashboard .btn-danger:hover {
+  background-color: #dc2626;
+  border-color: #dc2626;
+}
+
+.admin-dashboard .btn-info {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  color: #ffffff;
+}
+
+.admin-dashboard .btn-info:hover {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+
+.admin-dashboard .btn-warning {
+  background-color: #f59e0b;
+  border-color: #f59e0b;
+  color: #ffffff;
+}
+
+.admin-dashboard .btn-warning:hover {
+  background-color: #d97706;
+  border-color: #d97706;
+}
+
+/* Badges */
+.admin-dashboard .badge {
+  font-weight: 500;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.admin-dashboard .bg-success {
+  background-color: #10b981 !important;
+}
+
+.admin-dashboard .bg-danger {
+  background-color: #ef4444 !important;
+}
+
+.admin-dashboard .bg-warning {
+  background-color: #f59e0b !important;
+}
+
+/* Professional Stats Cards */
+.admin-dashboard .stats-cards {
+  margin-bottom: 2rem;
+}
+
+.admin-dashboard .stats-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.admin-dashboard .stats-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.admin-dashboard .stats-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+}
+
+.admin-dashboard .stats-card.pending::before {
+  background-color: #f59e0b;
+}
+
+.admin-dashboard .stats-card.confirmed::before {
+  background-color: #10b981;
+}
+
+.admin-dashboard .stats-card.cancelled::before {
+  background-color: #ef4444;
+}
+
+.admin-dashboard .stats-card .stats-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  font-size: 1.5rem;
+}
+
+.admin-dashboard .stats-card.pending .stats-icon {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.admin-dashboard .stats-card.confirmed .stats-icon {
+  background-color: #d1fae5;
+  color: #059669;
+}
+
+.admin-dashboard .stats-card.cancelled .stats-icon {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.admin-dashboard .stats-card .stats-number {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.25rem;
+  line-height: 1;
+}
+
+.admin-dashboard .stats-card .stats-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+/* Legacy stats cards for backward compatibility */
+.admin-dashboard .card.bg-warning,
+.admin-dashboard .card.bg-success,
+.admin-dashboard .card.bg-danger {
+  border: none;
+  color: #ffffff;
+}
+
+.admin-dashboard .card.bg-warning h4,
+.admin-dashboard .card.bg-success h4,
+.admin-dashboard .card.bg-danger h4 {
+  font-weight: 700;
+  font-size: 2rem;
+}
+
+/* Alert */
+.admin-dashboard .alert {
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background-color: #f9fafb;
+  color: #374151;
+}
+
+.admin-dashboard .alert-info {
+  border-color: #93c5fd;
+  background-color: #eff6ff;
+  color: #1e40af;
+}
+
+/* Logout Button */
+.admin-dashboard .logout-btn {
+  background-color: #ef4444;
+  border: 1px solid #ef4444;
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.15s ease;
+}
+
+.admin-dashboard .logout-btn:hover {
+  background-color: #dc2626;
+  border-color: #dc2626;
+}
+
+.admin-dashboard .logout-btn i {
+  margin-right: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .admin-dashboard .main-content {
+    padding: 1rem;
+  }
+
+  .admin-dashboard .sidebar {
+    position: fixed;
+    top: 73px;
+    left: -250px;
+    width: 250px;
+    height: calc(100vh - 73px);
+    z-index: 1000;
+    transition: left 0.3s ease;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .admin-dashboard .sidebar.show {
+    left: 0;
+  }
+
+  .admin-dashboard .btn-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-dashboard .table-responsive {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .admin-dashboard .card-body {
+    padding: 1rem;
+  }
+
+  .admin-dashboard .table thead th,
+  .admin-dashboard .table tbody td {
+    padding: 0.5rem;
+  }
+}

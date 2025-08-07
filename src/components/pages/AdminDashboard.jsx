@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import SystemSettings from './SystemSettings';
 import UploadMedicalRecord from './UploadMedicalRecord';
+import './AdminDashboard.css';
+import './PreviousAppointments.css';
 
 const AdminDashboard = ({ onLogout, adminData }) => {
   const [appointments, setAppointments] = useState([]);
@@ -115,133 +117,130 @@ const AdminDashboard = ({ onLogout, adminData }) => {
   if (showPreviousFilter) {
     return (
       <div className="appointment-filter-container">
-        <div className="container-fluid h-100">
-          <div className="row justify-content-center align-items-center min-vh-100">
-            <div className="col-md-10 col-lg-8">
-              <div className="admin-form-card">
-                <div className="text-center mb-4">
-                  <button
-                    className="back-btn"
-                    onClick={() => setShowPreviousFilter(false)}
-                  >
-                    <i className="fas fa-arrow-left me-2"></i>
-                    Back to Dashboard
-                  </button>
-                  <h2>Previous Appointments</h2>
-                  <p className="text-muted">Search appointments by date and month</p>
-                </div>
+        <div className="appointment-filter-card">
+          <div className="appointment-filter-header">
+            <button
+              className="back-btn"
+              onClick={() => setShowPreviousFilter(false)}
+            >
+              <i className="fas fa-arrow-left me-2"></i>
+              Back to Dashboard
+            </button>
+            <h2>Previous Appointments</h2>
+            <p>Search appointments by date and month</p>
+          </div>
 
-                <form onSubmit={handleFilterSubmit} className="mb-4">
-                  <div className="row">
-                    <div className="col-md-4">
-                      <label className="form-label fw-semibold">Year *</label>
-                      <input
-                        type="number"
-                        className="form-control"
-                        name="year"
-                        value={filterData.year}
-                        onChange={handleFilterChange}
-                        placeholder="2024"
-                        min="2020"
-                        max="2030"
-                        required
-                      />
-                    </div>
-                    <div className="col-md-4">
-                      <label className="form-label fw-semibold">Month *</label>
-                      <select
-                        className="form-control"
-                        name="month"
-                        value={filterData.month}
-                        onChange={handleFilterChange}
-                        required
-                      >
-                        <option value="">Select month</option>
-                        <option value="1">January</option>
-                        <option value="2">February</option>
-                        <option value="3">March</option>
-                        <option value="4">April</option>
-                        <option value="5">May</option>
-                        <option value="6">June</option>
-                        <option value="7">July</option>
-                        <option value="8">August</option>
-                        <option value="9">September</option>
-                        <option value="10">October</option>
-                        <option value="11">November</option>
-                        <option value="12">December</option>
-                      </select>
-                    </div>
-                    <div className="col-md-4">
-                      <label className="form-label fw-semibold">Date (Optional)</label>
-                      <input
-                        type="number"
-                        className="form-control"
-                        name="date"
-                        value={filterData.date}
-                        onChange={handleFilterChange}
-                        placeholder="Day"
-                        min="1"
-                        max="31"
-                      />
-                    </div>
-                  </div>
-                  <button type="submit" className="btn btn-primary mt-3">
-                    <i className="fas fa-search me-2"></i>
-                    Search Appointments
-                  </button>
-                </form>
-
-                {filteredAppointments.length > 0 && (
-                  <div>
-                    <h4 className="mb-3">Appointments for {filterDescription} ({filteredAppointments.length})</h4>
-                    <div className="table-responsive">
-                      <table className="table table-hover">
-                        <thead>
-                          <tr>
-                            <th>Date</th>
-                            <th>Time</th>
-                            <th>Patient</th>
-                            <th>Doctor</th>
-                            <th>Status</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {filteredAppointments.map((appointment) => (
-                            <tr key={appointment.id}>
-                              <td>{new Date(appointment.appointmentDate).toLocaleDateString()}</td>
-                              <td><strong>{appointment.appointmentTime}</strong></td>
-                              <td>
-                                <div>
-                                  <strong>{appointment.patient?.fullName}</strong>
-                                  <br />
-                                  <small className="text-muted">{appointment.patient?.email}</small>
-                                </div>
-                              </td>
-                              <td>Dr. {appointment.doctorName}</td>
-                              <td>
-                                <span className={`badge ${appointment.status === 'confirmed' ? 'bg-success' :
-                                  appointment.status === 'cancelled' ? 'bg-danger' : 'bg-warning'
-                                  }`}>
-                                  {appointment.status.toUpperCase()}
-                                </span>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )}
-
-                {filteredAppointments.length === 0 && filterDescription && (
-                  <div className="alert alert-info text-center">
-                    <i className="fas fa-info-circle me-2"></i>
-                    No appointments found for {filterDescription}
-                  </div>
-                )}
+          <form onSubmit={handleFilterSubmit} className="filter-form">
+            <div className="row">
+              <div className="col-md-4">
+                <label className="form-label">Year *</label>
+                <input
+                  type="number"
+                  className="form-control"
+                  name="year"
+                  value={filterData.year}
+                  onChange={handleFilterChange}
+                  placeholder="2024"
+                  min="2020"
+                  max="2030"
+                  required
+                />
+              </div>
+              <div className="col-md-4">
+                <label className="form-label">Month *</label>
+                <select
+                  className="form-select"
+                  name="month"
+                  value={filterData.month}
+                  onChange={handleFilterChange}
+                  required
+                >
+                  <option value="">Select month</option>
+                  <option value="1">January</option>
+                  <option value="2">February</option>
+                  <option value="3">March</option>
+                  <option value="4">April</option>
+                  <option value="5">May</option>
+                  <option value="6">June</option>
+                  <option value="7">July</option>
+                  <option value="8">August</option>
+                  <option value="9">September</option>
+                  <option value="10">October</option>
+                  <option value="11">November</option>
+                  <option value="12">December</option>
+                </select>
+              </div>
+              <div className="col-md-4">
+                <label className="form-label">Date (Optional)</label>
+                <input
+                  type="number"
+                  className="form-control"
+                  name="date"
+                  value={filterData.date}
+                  onChange={handleFilterChange}
+                  placeholder="Day"
+                  min="1"
+                  max="31"
+                />
               </div>
             </div>
-          </div>
+            <button type="submit" className="btn btn-primary mt-3">
+              <i className="fas fa-search me-2"></i>
+              Search Appointments
+            </button>
+          </form>
+
+          {filteredAppointments.length > 0 && (
+            <div className="results-section">
+              <div className="results-header">
+                <h4>Appointments for {filterDescription} ({filteredAppointments.length})</h4>
+              </div>
+              <div className="results-table">
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Time</th>
+                      <th>Patient</th>
+                      <th>Doctor</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredAppointments.map((appointment) => (
+                      <tr key={appointment.id}>
+                        <td>{new Date(appointment.appointmentDate).toLocaleDateString()}</td>
+                        <td><strong>{appointment.appointmentTime}</strong></td>
+                        <td>
+                          <div>
+                            <strong>{appointment.patient?.fullName}</strong>
+                            <br />
+                            <small>{appointment.patient?.email}</small>
+                          </div>
+                        </td>
+                        <td>Dr. {appointment.doctorName}</td>
+                        <td>
+                          <span className={`status-badge ${
+                            appointment.status === 'confirmed' ? 'confirmed' :
+                            appointment.status === 'cancelled' ? 'cancelled' : 'pending'
+                          }`}>
+                            {appointment.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {filteredAppointments.length === 0 && filterDescription && (
+            <div className="no-results-alert">
+              <i className="fas fa-info-circle"></i>
+              No appointments found for {filterDescription}
+            </div>
+          )}
         </div>
       </div>
     );
@@ -312,6 +311,37 @@ const AdminDashboard = ({ onLogout, adminData }) => {
 
           <div className="col-md-9 col-lg-10 main-content">
             <div className="p-4">
+              {/* Professional Stats Cards */}
+              <div className="row stats-cards mb-4">
+                <div className="col-md-4">
+                  <div className="stats-card pending">
+                    <div className="stats-icon">
+                      <i className="fas fa-clock"></i>
+                    </div>
+                    <div className="stats-number">{appointments.filter(apt => apt.status === 'pending').length}</div>
+                    <p className="stats-label">Pending</p>
+                  </div>
+                </div>
+                <div className="col-md-4">
+                  <div className="stats-card confirmed">
+                    <div className="stats-icon">
+                      <i className="fas fa-check-circle"></i>
+                    </div>
+                    <div className="stats-number">{appointments.filter(apt => apt.status === 'confirmed').length}</div>
+                    <p className="stats-label">Confirmed</p>
+                  </div>
+                </div>
+                <div className="col-md-4">
+                  <div className="stats-card cancelled">
+                    <div className="stats-icon">
+                      <i className="fas fa-times-circle"></i>
+                    </div>
+                    <div className="stats-number">{appointments.filter(apt => apt.status === 'cancelled').length}</div>
+                    <p className="stats-label">Cancelled</p>
+                  </div>
+                </div>
+              </div>
+
               <div className="d-flex justify-content-between align-items-center mb-4">
                 <div>
                   <h2>Today's Appointments ({appointments.length})</h2>
@@ -431,32 +461,7 @@ const AdminDashboard = ({ onLogout, adminData }) => {
                 </div>
               </div>
 
-              <div className="row mt-4">
-                <div className="col-md-4">
-                  <div className="card bg-warning text-white">
-                    <div className="card-body text-center">
-                      <h4>{appointments.filter(apt => apt.status === 'pending').length}</h4>
-                      <p className="mb-0">Pending</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="col-md-4">
-                  <div className="card bg-success text-white">
-                    <div className="card-body text-center">
-                      <h4>{appointments.filter(apt => apt.status === 'confirmed').length}</h4>
-                      <p className="mb-0">Confirmed</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="col-md-4">
-                  <div className="card bg-danger text-white">
-                    <div className="card-body text-center">
-                      <h4>{appointments.filter(apt => apt.status === 'cancelled').length}</h4>
-                      <p className="mb-0">Cancelled</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+
 
               <div className="alert alert-info mt-4">
                 <i className="fas fa-info-circle me-2"></i>

@@ -49,132 +49,131 @@ const Signup = () => {
     const handleGoToLogin = () => navigate('/login');
 
     return (
-        <div className="auth-container">
-            <div className="auth-background">
-                <div className="container-fluid h-100">
-                    <div className="row h-100">
-                        {/* Left Side - Image/Info */}
-                        <div className="col-lg-6 d-none d-lg-flex align-items-center justify-content-center bg-gradient-secondary">
-                            <div className="text-center text-white p-5">
-                                <div className="auth-illustration mb-4">
-                                    <i className="fas fa-user-plus fa-5x mb-4 opacity-75"></i>
+        <div className="login-container">
+            <div className="container-fluid h-100">
+                <div className="row h-100">
+                    {/* Left Side - Image/Info */}
+                    <div className="col-lg-6 d-none d-lg-flex">
+                        <div className="login-info-side">
+                            <div className="info-icon">
+                                <i className="fas fa-user-plus"></i>
+                            </div>
+                            <h3 className="info-title">Join Our Healthcare Community</h3>
+                            <p className="info-description">
+                                Get personalized healthcare services and connect with top medical professionals
+                            </p>
+                            <div className="info-features">
+                                <div className="feature-item">
+                                    <div className="feature-icon">
+                                        <i className="fas fa-shield-alt"></i>
+                                    </div>
+                                    <p className="feature-text">Secure & Private</p>
                                 </div>
-                                <h3 className="fw-bold mb-3">Join Our Healthcare Community</h3>
-                                <p className="lead opacity-90 mb-4">
-                                    Get personalized healthcare services and connect with top medical professionals
-                                </p>
-                                <div className="row text-center">
-                                    <div className="col-4">
-                                        <i className="fas fa-shield-alt fa-2x mb-2"></i>
-                                        <p className="small mb-0">Secure & Private</p>
+                                <div className="feature-item">
+                                    <div className="feature-icon">
+                                        <i className="fas fa-clock"></i>
                                     </div>
-                                    <div className="col-4">
-                                        <i className="fas fa-clock fa-2x mb-2"></i>
-                                        <p className="small mb-0">24/7 Available</p>
+                                    <p className="feature-text">24/7 Available</p>
+                                </div>
+                                <div className="feature-item">
+                                    <div className="feature-icon">
+                                        <i className="fas fa-award"></i>
                                     </div>
-                                    <div className="col-4">
-                                        <i className="fas fa-award fa-2x mb-2"></i>
-                                        <p className="small mb-0">Expert Care</p>
-                                    </div>
+                                    <p className="feature-text">Expert Care</p>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        {/* Right Side - Form */}
-                        <div className="col-lg-6 d-flex align-items-center justify-content-center">
-                            <div className="auth-form-container">
-                                <div className="text-center mb-4">
-                                    <button
-                                        className="btn btn-link text-muted p-0 mb-3"
-                                        onClick={handleBackToHome}
-                                    >
-                                        <i className="fas fa-arrow-left me-2"></i>
-                                        Back to Home
-                                    </button>
-                                    <h2 className="fw-bold text-dark mb-2">Create Account</h2>
-                                    <p className="text-muted">Start your healthcare journey with us</p>
+                    {/* Right Side - Form */}
+                    <div className="col-lg-6 d-flex align-items-center justify-content-center">
+                        <div className="login-card">
+                            <div className="login-header">
+                                <button
+                                    className="back-btn"
+                                    onClick={handleBackToHome}
+                                >
+                                    <i className="fas fa-arrow-left me-2"></i>
+                                    Back to Home
+                                </button>
+                                <h2 className="login-title">Create Account</h2>
+                                <p className="login-subtitle">Start your healthcare journey with us</p>
+                            </div>
+
+                            <form onSubmit={handleSubmit} className="login-form">
+                                <div className="form-group">
+                                    <label>Full Name</label>
+                                    <div className="input-wrapper">
+                                        <i className="fas fa-user input-icon"></i>
+                                        <input
+                                            type="text"
+                                            className="form-input"
+                                            name="fullName"
+                                            value={formData.fullName}
+                                            onChange={handleChange}
+                                            placeholder="Enter your full name"
+                                            required
+                                        />
+                                    </div>
                                 </div>
 
-                                <form onSubmit={handleSubmit} className="auth-form">
-                                    <div className="mb-3">
-                                        <label className="form-label fw-semibold">Full Name</label>
-                                        <div className="input-group">
-                                            <span className="input-group-text bg-light border-end-0">
-                                                <i className="fas fa-user text-muted"></i>
-                                            </span>
-                                            <input
-                                                type="text"
-                                                className="form-control border-start-0 ps-0"
-                                                name="fullName"
-                                                value={formData.fullName}
-                                                onChange={handleChange}
-                                                placeholder="Enter your full name"
-                                                required
-                                            />
-                                        </div>
+                                <div className="form-group">
+                                    <label>Email Address</label>
+                                    <div className="input-wrapper">
+                                        <i className="fas fa-envelope input-icon"></i>
+                                        <input
+                                            type="email"
+                                            className="form-input"
+                                            name="email"
+                                            value={formData.email}
+                                            onChange={handleChange}
+                                            placeholder="Enter your email"
+                                            required
+                                        />
                                     </div>
+                                </div>
 
-                                    <div className="mb-3">
-                                        <label className="form-label fw-semibold">Email Address</label>
-                                        <div className="input-group">
-                                            <span className="input-group-text bg-light border-end-0">
-                                                <i className="fas fa-envelope text-muted"></i>
-                                            </span>
-                                            <input
-                                                type="email"
-                                                className="form-control border-start-0 ps-0"
-                                                name="email"
-                                                value={formData.email}
-                                                onChange={handleChange}
-                                                placeholder="Enter your email"
-                                                required
-                                            />
-                                        </div>
+                                <div className="form-group">
+                                    <label>Password</label>
+                                    <div className="input-wrapper">
+                                        <i className="fas fa-lock input-icon"></i>
+                                        <input
+                                            type="password"
+                                            className="form-input"
+                                            name="password"
+                                            value={formData.password}
+                                            onChange={handleChange}
+                                            placeholder="Create a password"
+                                            required
+                                        />
                                     </div>
+                                </div>
 
-                                    <div className="mb-3">
-                                        <label className="form-label fw-semibold">Password</label>
-                                        <div className="input-group">
-                                            <span className="input-group-text bg-light border-end-0">
-                                                <i className="fas fa-lock text-muted"></i>
-                                            </span>
-                                            <input
-                                                type="password"
-                                                className="form-control border-start-0 ps-0"
-                                                name="password"
-                                                value={formData.password}
-                                                onChange={handleChange}
-                                                placeholder="Create a password"
-                                                required
-                                            />
-                                        </div>
-                                    </div>
+                                <div className="remember-me">
+                                    <input type="checkbox" id="terms" required />
+                                    <label htmlFor="terms">
+                                        I agree to the <a href="#" className="text-primary">Terms of Service</a> and <a href="#" className="text-primary">Privacy Policy</a>
+                                    </label>
+                                </div>
 
-                                    <div className="form-check mb-4">
-                                        <input className="form-check-input" type="checkbox" id="terms" required />
-                                        <label className="form-check-label text-muted" htmlFor="terms">
-                                            I agree to the <a href="#" className="text-primary">Terms of Service</a> and <a href="#" className="text-primary">Privacy Policy</a>
-                                        </label>
-                                    </div>
+                                <button type="submit" className="login-btn">
+                                    <i className="fas fa-user-plus me-2"></i>
+                                    Create Account
+                                </button>
 
-                                    <button type="submit" className="btn btn-primary w-100 py-3 mb-4">
-                                        Create Account
-                                    </button>
-
-                                    <div className="text-center">
-                                        <p className="text-muted mb-0">
-                                            Already have an account?{' '}
-                                            <button
-                                                type="button"
-                                                className="btn btn-link text-primary p-0 text-decoration-none"
-                                                onClick={handleGoToLogin}
-                                            >
-                                                Sign in here
-                                            </button>
-                                        </p>
-                                    </div>
-                                </form>
-                            </div>
+                                <div className="signup-link">
+                                    <p>
+                                        Already have an account?{' '}
+                                        <button
+                                            type="button"
+                                            className="signup-btn"
+                                            onClick={handleGoToLogin}
+                                        >
+                                            Sign in here
+                                        </button>
+                                    </p>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>

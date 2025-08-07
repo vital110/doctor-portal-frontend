@@ -44,12 +44,19 @@ body {
 
 .hero-image-container {
   position: relative;
-  animation: float 3s ease-in-out infinite;
+  animation: float ease-in-out infinite;
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .hero-card {
@@ -132,11 +139,11 @@ body {
   .display-4 {
     font-size: 2.5rem;
   }
-  
+
   .hero-section {
     padding: 3rem 0;
   }
-  
+
   .stat-item h3 {
     font-size: 2rem;
   }
@@ -153,8 +160,15 @@ html {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Authentication Pages - Ultra Flexible & Attractive */
@@ -176,7 +190,7 @@ html {
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
   animation: float 6s ease-in-out infinite;
 }
 
@@ -188,7 +202,7 @@ html {
   padding: 1.25rem;
   width: 100%;
   max-width: 380px;
-  box-shadow: 
+  box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.1),
     0 0 0 1px rgba(255, 255, 255, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.4);
@@ -202,6 +216,7 @@ html {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -327,7 +342,7 @@ html {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
   transition: left 0.5s;
 }
 
@@ -369,17 +384,17 @@ html {
     margin: 0.5rem;
     max-width: 320px;
   }
-  
+
   .admin-form-card .role-selection {
     grid-template-columns: 1fr;
     gap: 0.4rem;
   }
-  
+
   .admin-form-card .role-btn {
     padding: 0.5rem;
     font-size: 0.7rem;
   }
-  
+
   .admin-form-card h2 {
     font-size: 1.3rem;
   }
@@ -491,8 +506,15 @@ html {
 }
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
 }
 
 /* Admin List Modal */
@@ -556,20 +578,20 @@ html {
   .sidebar {
     min-height: auto;
   }
-  
+
   .main-content {
     margin-top: 1rem;
   }
-  
+
   .logout-btn {
     padding: 8px 16px;
     font-size: 0.9rem;
   }
-  
+
   .logout-btn span {
     display: none;
   }
-  
+
   .admin-list-card {
     padding: 1.5rem;
     margin: 0.5rem;

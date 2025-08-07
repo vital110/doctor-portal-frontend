@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ManagerDashboard from './ManagerDashboard';
 import AdminDashboard from './AdminDashboard';
 import PatientDashboard from './PatientDashboard';
+import './Login.css';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -117,125 +118,124 @@ const Login = () => {
     }
 
     return (
-        <div className="auth-container">
-            <div className="auth-background">
-                <div className="container-fluid h-100">
-                    <div className="row h-100">
-                        {/* Left Side - Form */}
-                        <div className="col-lg-6 d-flex align-items-center justify-content-center">
-                            <div className="auth-form-container">
-                                <div className="text-center mb-4">
-                                    <button
-                                        type="button"
-                                        className="btn btn-link text-muted p-0 mb-3"
-                                        onClick={handleBackToHome}
-                                    >
-                                        <i className="fas fa-arrow-left me-2"></i>
-                                        Back to Home
-                                    </button>
-                                    <h2 className="fw-bold text-dark mb-2">Welcome Back</h2>
-                                    <p className="text-muted">Sign in to access your healthcare dashboard</p>
+        <div className="login-container">
+            <div className="container-fluid h-100">
+                <div className="row h-100">
+                    {/* Left Side - Form */}
+                    <div className="col-lg-6 d-flex align-items-center justify-content-center">
+                        <div className="login-card">
+                            <div className="login-header">
+                                <button
+                                    type="button"
+                                    className="back-btn"
+                                    onClick={handleBackToHome}
+                                >
+                                    <i className="fas fa-arrow-left me-2"></i>
+                                    Back to Home
+                                </button>
+                                <h2 className="login-title">Welcome Back</h2>
+                                <p className="login-subtitle">Sign in to access your healthcare dashboard</p>
+                            </div>
+
+                            <form onSubmit={handleSubmit} className="login-form">
+                                <div className="form-group">
+                                    <label>Email Address</label>
+                                    <div className="input-wrapper">
+                                        <i className="fas fa-envelope input-icon"></i>
+                                        <input
+                                            type="email"
+                                            className="form-input"
+                                            name="email"
+                                            value={formData.email}
+                                            onChange={handleChange}
+                                            placeholder="Enter your email"
+                                            required
+                                        />
+                                    </div>
                                 </div>
 
-                                <form onSubmit={handleSubmit} className="auth-form">
-                                    <div className="mb-4">
-                                        <label className="form-label fw-semibold">Email Address</label>
-                                        <div className="input-group">
-                                            <span className="input-group-text bg-light border-end-0">
-                                                <i className="fas fa-envelope text-muted"></i>
-                                            </span>
-                                            <input
-                                                type="email"
-                                                className="form-control border-start-0 ps-0"
-                                                name="email"
-                                                value={formData.email}
-                                                onChange={handleChange}
-                                                placeholder="Enter your email"
-                                                required
-                                            />
-                                        </div>
+                                <div className="form-group">
+                                    <label>Password</label>
+                                    <div className="input-wrapper">
+                                        <i className="fas fa-lock input-icon"></i>
+                                        <input
+                                            type="password"
+                                            className="form-input"
+                                            name="password"
+                                            value={formData.password}
+                                            onChange={handleChange}
+                                            placeholder="Enter your password"
+                                            required
+                                        />
                                     </div>
+                                </div>
 
-                                    <div className="mb-4">
-                                        <label className="form-label fw-semibold">Password</label>
-                                        <div className="input-group">
-                                            <span className="input-group-text bg-light border-end-0">
-                                                <i className="fas fa-lock text-muted"></i>
-                                            </span>
-                                            <input
-                                                type="password"
-                                                className="form-control border-start-0 ps-0"
-                                                name="password"
-                                                value={formData.password}
-                                                onChange={handleChange}
-                                                placeholder="Enter your password"
-                                                required
-                                            />
-                                        </div>
+                                <div className="form-options">
+                                    <div className="remember-me">
+                                        <input type="checkbox" id="remember" />
+                                        <label htmlFor="remember">Remember me</label>
                                     </div>
+                                    <a href="#" className="forgot-password">
+                                        Forgot Password?
+                                    </a>
+                                </div>
 
-                                    <div className="d-flex justify-content-between align-items-center mb-4">
-                                        <div className="form-check">
-                                            <input className="form-check-input" type="checkbox" id="remember" />
-                                            <label className="form-check-label text-muted" htmlFor="remember">
-                                                Remember me
-                                            </label>
-                                        </div>
-                                        <a href="#" className="text-primary text-decoration-none">
-                                            Forgot Password?
-                                        </a>
-                                    </div>
+                                <button type="submit" className="login-btn">
+                                    <i className="fas fa-sign-in-alt me-2"></i>
+                                    Sign In
+                                </button>
 
-                                    <button type="submit" className="btn btn-primary w-100 py-3 mb-4">
-                                        Sign In
-                                    </button>
-
-                                    <div className="text-center">
-                                        <p className="text-muted mb-0">
-                                            Don't have an account?{' '}
-                                            <button
-                                                type="button"
-                                                className="btn btn-link text-primary p-0 text-decoration-none"
-                                                onClick={handleGoToSignup}
-                                            >
-                                                Sign up here
-                                            </button>
-                                        </p>
-                                    </div>
-                                </form>
-                            </div>
+                                <div className="signup-link">
+                                    <p>
+                                        Don't have an account?{' '}
+                                        <button
+                                            type="button"
+                                            className="signup-btn"
+                                            onClick={handleGoToSignup}
+                                        >
+                                            Sign up here
+                                        </button>
+                                    </p>
+                                </div>
+                            </form>
                         </div>
+                    </div>
 
-                        {/* Right Side - Image/Info */}
-                        <div className="col-lg-6 d-none d-lg-flex align-items-center justify-content-center bg-gradient-primary">
-                            <div className="text-center text-white p-5">
-                                <div className="auth-illustration mb-4">
-                                    <i className="fas fa-user-md fa-5x mb-4 opacity-75"></i>
-                                </div>
-                                <h3 className="fw-bold mb-3">Access Your Health Dashboard</h3>
-                                <p className="lead opacity-90 mb-4">
-                                    Manage appointments, view medical records, and connect with healthcare professionals
-                                </p>
-                                <div className="d-flex justify-content-center gap-4">
-                                    <div className="text-center">
-                                        <i className="fas fa-calendar-check fa-2x mb-2"></i>
-                                        <p className="small mb-0">Book Appointments</p>
-                                    </div>
-                                    <div className="text-center">
-                                        <i className="fas fa-file-medical fa-2x mb-2"></i>
-                                        <p className="small mb-0">Medical Records</p>
-                                    </div>
-                                    <div className="text-center">
-                                        <i className="fas fa-comments fa-2x mb-2"></i>
-                                        <p className="small mb-0">Chat with Doctors</p>
-                                    </div>
-                                </div>
+                    {/* Right Side - Image/Info */}
+                    <div className="col-lg-6 d-none d-lg-flex">
+                        <div className="login-info-side">
+                            <div className="info-icon">
+                                <i className="fas fa-user-md"></i>
                             </div>
+                            <h3 className="info-title">Access Your Health Dashboard</h3>
+                            <p className="info-description">
+                                Manage appointments, view medical records, and connect with healthcare professionals
+                            </p>
+                            {/* <div className="info-features"> */}
+                            {/* <div className="feature-item">
+                                <div className="feature-icon">
+                                    <i className="fas fa-calendar-check"></i>
+                                </div> */}
+                            {/* <p className="feature-text">Book Appointments</p> */}
+                            {/* </div>
+                        <div className="feature-item">
+                            <div className="feature-icon"> */}
+                            {/* <i className="fas fa-file-medical"></i>
+                        </div>
+                        <p className="feature-text">Medical Records</p>
+                    </div> */}
+                            {/* <div className="feature-item">
+                                <div className="feature-icon">
+                                    <i className="fas fa-comments"></i>
+                                </div> */}
+                            {/* <p className="feature-text">Chat with Doctors</p> */}
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
+        // </div >
+        // </div >
     );
 };
 

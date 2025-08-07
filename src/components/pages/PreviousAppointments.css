@@ -1,0 +1,298 @@
+/* Professional Previous Appointments Form Styles */
+.appointment-filter-container {
+  min-height: 100vh;
+  background-color: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.appointment-filter-card {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  width: 100%;
+  max-width: 900px;
+  position: relative;
+}
+
+/* Header Section */
+.appointment-filter-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.appointment-filter-header .back-btn {
+  background: none;
+  border: 1px solid #d1d5db;
+  color: #6b7280;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.15s ease;
+  margin-bottom: 1rem;
+  cursor: pointer;
+}
+
+.appointment-filter-header .back-btn:hover {
+  background-color: #f9fafb;
+  border-color: #9ca3af;
+  color: #374151;
+}
+
+.appointment-filter-header h2 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.appointment-filter-header p {
+  color: #6b7280;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Filter Form */
+.filter-form {
+  background-color: #f9fafb;
+  border: 1px solid #f3f4f6;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.filter-form .form-label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.filter-form .form-control,
+.filter-form .form-select {
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  color: #374151;
+  background-color: #ffffff;
+  transition: all 0.15s ease;
+}
+
+.filter-form .form-control:focus,
+.filter-form .form-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.filter-form .btn-primary {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  color: #ffffff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.15s ease;
+}
+
+.filter-form .btn-primary:hover {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+
+/* Results Section */
+.results-section {
+  margin-top: 2rem;
+}
+
+.results-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.results-header h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+/* Professional Table */
+.results-table {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.results-table .table {
+  margin-bottom: 0;
+}
+
+.results-table .table thead th {
+  background-color: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  border-top: none;
+  color: #374151;
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: 1rem 0.75rem;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+.results-table .table tbody tr {
+  border-bottom: 1px solid #f3f4f6;
+  transition: background-color 0.15s ease;
+}
+
+.results-table .table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+.results-table .table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.results-table .table tbody td {
+  padding: 1rem 0.75rem;
+  border-top: none;
+  color: #374151;
+  font-size: 0.875rem;
+  vertical-align: middle;
+}
+
+.results-table .table tbody td strong {
+  color: #111827;
+  font-weight: 600;
+}
+
+.results-table .table tbody td small {
+  color: #6b7280;
+  font-size: 0.75rem;
+}
+
+/* Status Badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.status-badge.confirmed {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-badge.cancelled {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.status-badge.pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+/* No Results Alert */
+.no-results-alert {
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  color: #1e40af;
+}
+
+.no-results-alert i {
+  font-size: 1.25rem;
+  margin-right: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .appointment-filter-container {
+    padding: 1rem;
+  }
+  
+  .appointment-filter-card {
+    padding: 1.5rem;
+    margin: 0.5rem;
+  }
+  
+  .appointment-filter-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .filter-form {
+    padding: 1rem;
+  }
+  
+  .filter-form .row {
+    margin: 0;
+  }
+  
+  .filter-form .col-md-4 {
+    padding: 0;
+    margin-bottom: 1rem;
+  }
+  
+  .results-table {
+    font-size: 0.8rem;
+  }
+  
+  .results-table .table thead th,
+  .results-table .table tbody td {
+    padding: 0.75rem 0.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .appointment-filter-card {
+    padding: 1rem;
+  }
+  
+  .appointment-filter-header {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+  }
+  
+  .appointment-filter-header h2 {
+    font-size: 1.25rem;
+  }
+  
+  .filter-form {
+    padding: 0.75rem;
+  }
+  
+  .results-table .table {
+    font-size: 0.75rem;
+  }
+  
+  .results-table .table thead th,
+  .results-table .table tbody td {
+    padding: 0.5rem 0.25rem;
+  }
+  
+  .status-badge {
+    font-size: 0.625rem;
+    padding: 0.125rem 0.5rem;
+  }
+}
