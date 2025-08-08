@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
@@ -47,6 +47,43 @@ const Signup = () => {
 
     const handleBackToHome = () => navigate('/');
     const handleGoToLogin = () => navigate('/login');
+
+    const handleGoogleSignup = () => {
+        const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=764086051850-6qr4p6gpi6hn506pt8ejuq83di341hur.apps.googleusercontent.com&redirect_uri=${encodeURIComponent('http://localhost:5173/login')}&response_type=code&scope=email profile&prompt=select_account`;
+        window.open(googleAuthUrl, 'googleSignup', 'width=500,height=600,scrollbars=yes,resizable=yes');
+    };
+
+    const handleGoogleResponse = async (response) => {
+        try {
+            // Decode JWT token to get user info
+            const payload = JSON.parse(atob(response.credential.split('.')[1]));
+            
+            const googleSignupData = {
+                email: payload.email,
+                name: payload.name,
+                googleId: payload.sub
+            };
+
+            const apiResponse = await fetch('http://localhost:3001/api/auth/google-signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(googleSignupData)
+            });
+
+            const result = await apiResponse.json();
+
+            if (result.success) {
+                alert('Google signup successful! Please login.');
+                navigate('/login');
+            } else {
+                alert(result.message || 'Google signup failed');
+            }
+        } catch (error) {
+            alert('Error with Google signup: ' + error.message);
+        }
+    };
 
     return (
         <div className="login-container">
@@ -159,6 +196,19 @@ const Signup = () => {
                                 <button type="submit" className="login-btn">
                                     <i className="fas fa-user-plus me-2"></i>
                                     Create Account
+                                </button>
+                                
+                                <div className="text-center my-3">
+                                    <span className="text-muted">or</span>
+                                </div>
+                                
+                                <button 
+                                    type="button" 
+                                    className="btn btn-outline-danger w-100 py-3"
+                                    onClick={handleGoogleSignup}
+                                >
+                                    <i className="fab fa-google me-2"></i>
+                                    Sign up with Google
                                 </button>
 
                                 <div className="signup-link">

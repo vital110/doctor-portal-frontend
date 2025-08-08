@@ -1402,4 +1402,49 @@ router.delete('/patient-document/:documentId', async (req, res) => {
   }
 });
 
+// Google OAuth callback for patient registration
+router.post('/google-signup', async (req, res) => {
+  try {
+    const { email, name, googleId } = req.body;
+
+    // Check if patient already exists
+    const existingPatient = await Patient.findOne({ where: { email } });
+    if (existingPatient) {
+      return res.json({
+        success: true,
+        message: 'Patient already exists, please login',
+        patient: {
+          id: existingPatient.id,
+          fullName: existingPatient.fullName,
+          email: existingPatient.email
+        }
+      });
+    }
+
+    // Create new patient with Google data
+    const patient = await Patient.create({
+      fullName: name,
+      email: email,
+      password: await bcrypt.hash(googleId, 12), // Use googleId as password
+      googleId: googleId
+    });
+
+    res.json({
+      success: true,
+      message: 'Google signup successful',
+      patient: {
+        id: patient.id,
+        fullName: patient.fullName,
+        email: patient.email
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error with Google signup',
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;
