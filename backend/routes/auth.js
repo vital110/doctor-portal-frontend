@@ -267,6 +267,22 @@ router.post('/book-appointment', async (req, res) => {
 
     const { patientId, doctorName, appointmentDate, appointmentTime, reason } = value;
 
+    // Check if the appointment date is a holiday
+    const holiday = await Holiday.findOne({
+      where: {
+        date: appointmentDate,
+        isActive: true
+      }
+    });
+
+    if (holiday) {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot book appointment on ${new Date(appointmentDate).toLocaleDateString()}. It's a holiday: ${holiday.reason}`,
+        isHoliday: true
+      });
+    }
+
     // Check if doctor is on leave on the appointment date
     const doctorLeave = await DoctorLeave.findOne({
       where: {
