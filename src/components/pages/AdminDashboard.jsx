@@ -1,16 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import SystemSettings from './SystemSettings';
 import UploadMedicalRecord from './UploadMedicalRecord';
 import './AdminDashboard.css';
 import './PreviousAppointments.css';
 
 const AdminDashboard = ({ onLogout, adminData }) => {
+  const timeoutRef = useRef(null);
+  const TIMEOUT_DURATION = 10 * 60 * 1000; // 10 minutes
   const [appointments, setAppointments] = useState([]);
   const [selectedAppointments, setSelectedAppointments] = useState([]);
   const [currentDate, setCurrentDate] = useState('');
   const [showPreviousFilter, setShowPreviousFilter] = useState(false);
   const [showSystemSettings, setShowSystemSettings] = useState(false);
   const [showUploadMedical, setShowUploadMedical] = useState(false);
+  const [showAdminLeave, setShowAdminLeave] = useState(false);
+  const [leaveFormData, setLeaveFormData] = useState({
+    leaveDate: '',
+    reason: ''
+  });
   const [filterData, setFilterData] = useState({
     year: '',
     month: '',
@@ -18,11 +25,45 @@ const AdminDashboard = ({ onLogout, adminData }) => {
   });
   const [filteredAppointments, setFilteredAppointments] = useState([]);
   const [filterDescription, setFilterDescription] = useState('');
+  const [leaveStatusPopup, setLeaveStatusPopup] = useState(null);
+
+  const resetTimeout = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(() => {
+      alert('Session expired due to inactivity. You will be logged out.');
+      onLogout();
+    }, TIMEOUT_DURATION);
+  };
 
   useEffect(() => {
     fetchTodayAppointments();
+    checkLeaveStatus();
     const interval = setInterval(fetchTodayAppointments, 5 * 60 * 1000);
-    return () => clearInterval(interval);
+    const leaveInterval = setInterval(checkLeaveStatus, 30 * 1000);
+    
+    // Set up auto-logout
+    resetTimeout();
+    
+    // Activity event listeners
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+    const resetTimeoutHandler = () => resetTimeout();
+    
+    events.forEach(event => {
+      document.addEventListener(event, resetTimeoutHandler, true);
+    });
+    
+    return () => {
+      clearInterval(interval);
+      clearInterval(leaveInterval);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      events.forEach(event => {
+        document.removeEventListener(event, resetTimeoutHandler, true);
+      });
+    };
   }, []);
 
   const fetchTodayAppointments = async () => {
@@ -106,12 +147,130 @@ const AdminDashboard = ({ onLogout, adminData }) => {
     fetchPreviousAppointments();
   };
 
+  const handleLeaveFormChange = (e) => {
+    setLeaveFormData({
+      ...leaveFormData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const checkLeaveStatus = async () => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/auth/admin-leaves-status/${adminData?.fullName || 'Admin'}`);
+      const result = await response.json();
+      
+      if (result.success && result.leave) {
+        const lastChecked = localStorage.getItem(`lastLeaveCheck_${result.leave.id}`);
+        
+        if (!lastChecked) {
+          setLeaveStatusPopup(result.leave);
+          localStorage.setItem(`lastLeaveCheck_${result.leave.id}`, 'seen');
+        }
+      }
+    } catch (error) {
+      console.error('Error checking leave status:', error);
+    }
+  };
+
+  const handleLeaveSubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      const response = await fetch('http://localhost:3001/api/auth/admin-leaves', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          adminName: adminData?.fullName || 'Admin',
+          leaveDate: leaveFormData.leaveDate,
+          reason: leaveFormData.reason
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert('Leave request submitted successfully!');
+        setLeaveFormData({ leaveDate: '', reason: '' });
+        setShowAdminLeave(false);
+      } else {
+        alert(result.message || 'Failed to submit leave request');
+      }
+    } catch (error) {
+      alert('Error submitting leave request: ' + error.message);
+    }
+  };
+
+  const closeLeavePopup = () => {
+    setLeaveStatusPopup(null);
+  };
+
   if (showUploadMedical) {
     return <UploadMedicalRecord onBack={() => setShowUploadMedical(false)} adminData={adminData} />;
   }
 
   if (showSystemSettings) {
     return <SystemSettings onBack={() => setShowSystemSettings(false)} />;
+  }
+
+  if (showAdminLeave) {
+    return (
+      <div className="admin-leave-container">
+        <div className="container-fluid h-100">
+          <div className="row justify-content-center align-items-center min-vh-100">
+            <div className="col-md-6 col-lg-5">
+              <div className="admin-form-card">
+                <div className="text-center mb-4">
+                  <button
+                    className="back-btn"
+                    onClick={() => setShowAdminLeave(false)}
+                  >
+                    <i className="fas fa-arrow-left me-2"></i>
+                    Back to Dashboard
+                  </button>
+                  <h2><i className="fas fa-calendar-times me-2"></i>Request Leave</h2>
+                  <p className="text-muted">Submit your leave request to manager</p>
+                </div>
+
+                <form onSubmit={handleLeaveSubmit}>
+                  <div className="mb-3">
+                    <label className="form-label fw-semibold">Leave Date *</label>
+                    <input
+                      type="date"
+                      className="form-control"
+                      name="leaveDate"
+                      value={leaveFormData.leaveDate}
+                      onChange={handleLeaveFormChange}
+                      min={new Date().toISOString().split('T')[0]}
+                      required
+                    />
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="form-label fw-semibold">Reason *</label>
+                    <textarea
+                      className="form-control"
+                      name="reason"
+                      value={leaveFormData.reason}
+                      onChange={handleLeaveFormChange}
+                      placeholder="Please provide reason for leave"
+                      rows="4"
+                      required
+                    ></textarea>
+                  </div>
+
+                  <button type="submit" className="btn btn-primary w-100 py-3">
+                    <i className="fas fa-paper-plane me-2"></i>
+                    Submit Leave Request
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (showPreviousFilter) {
@@ -305,6 +464,12 @@ const AdminDashboard = ({ onLogout, adminData }) => {
                     System Settings
                   </a>
                 </li>
+                <li className="nav-item mb-2">
+                  <a className="nav-link" href="#" onClick={() => setShowAdminLeave(true)}>
+                    <i className="fas fa-calendar-times me-2"></i>
+                    Request Leave
+                  </a>
+                </li>
               </ul>
             </div>
           </div>
@@ -471,6 +636,39 @@ const AdminDashboard = ({ onLogout, adminData }) => {
           </div>
         </div>
       </div>
+
+      {/* Leave Status Popup */}
+      {leaveStatusPopup && (
+        <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">
+                  <i className={`fas ${leaveStatusPopup.status === 'approved' ? 'fa-check-circle text-success' : 'fa-times-circle text-danger'} me-2`}></i>
+                  Leave Request {leaveStatusPopup.status === 'approved' ? 'Approved' : 'Rejected'}
+                </h5>
+                <button type="button" className="btn-close" onClick={closeLeavePopup}></button>
+              </div>
+              <div className="modal-body">
+                <p><strong>Leave Date:</strong> {new Date(leaveStatusPopup.leaveDate).toLocaleDateString()}</p>
+                <p><strong>Reason:</strong> {leaveStatusPopup.reason}</p>
+                <p><strong>Status:</strong> 
+                  <span className={`badge ms-2 ${
+                    leaveStatusPopup.status === 'approved' ? 'bg-success' : 'bg-danger'
+                  }`}>
+                    {leaveStatusPopup.status.toUpperCase()}
+                  </span>
+                </p>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-primary" onClick={closeLeavePopup}>
+                  OK
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

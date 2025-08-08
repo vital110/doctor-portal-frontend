@@ -94,7 +94,7 @@ const Signup = () => {
                                     onClick={handleBackToHome}
                                 >
                                     <i className="fas fa-arrow-left me-2"></i>
-                                    Back to Home
+
                                 </button>
                                 <h2 className="login-title">Create Account</h2>
                                 <p className="login-subtitle">Start your healthcare journey with us</p>

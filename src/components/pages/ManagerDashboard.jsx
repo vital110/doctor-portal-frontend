@@ -20,10 +20,74 @@ const ManagerDashboard = ({ onLogout }) => {
     password: '',
     role: 'admin'
   });
+  const [showAdminLeaves, setShowAdminLeaves] = useState(false);
+  const [adminLeaves, setAdminLeaves] = useState([]);
+  const [disabledButtons, setDisabledButtons] = useState(() => {
+    const saved = localStorage.getItem('disabledLeaveButtons');
+    return saved ? new Set(JSON.parse(saved)) : new Set();
+  });
 
   useEffect(() => {
     fetchAdminCount();
   }, []);
+
+  const fetchAdminLeaves = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/api/auth/admin-leaves');
+      const result = await response.json();
+      if (result.success) {
+        setAdminLeaves(result.leaves);
+      }
+    } catch (error) {
+      console.error('Error fetching admin leaves:', error);
+    }
+  };
+
+  const handleAdminLeavesClick = () => {
+    fetchAdminLeaves();
+    setShowAdminLeaves(true);
+  };
+
+  const handleLeaveAction = async (leaveId, action) => {
+    const newDisabledSet = new Set(disabledButtons).add(leaveId);
+    setDisabledButtons(newDisabledSet);
+    localStorage.setItem('disabledLeaveButtons', JSON.stringify([...newDisabledSet]));
+
+    try {
+      const response = await fetch(`http://localhost:3001/api/auth/admin-leaves/${leaveId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: action })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert(`Leave request ${action} successfully!`);
+        setAdminLeaves(prev =>
+          prev.map(leave =>
+            leave.id === leaveId
+              ? { ...leave, status: action }
+              : leave
+          )
+        );
+      } else {
+        alert(result.message || `Failed to ${action} leave request`);
+        const revertedSet = new Set(disabledButtons);
+        revertedSet.delete(leaveId);
+        setDisabledButtons(revertedSet);
+        localStorage.setItem('disabledLeaveButtons', JSON.stringify([...revertedSet]));
+      }
+    } catch (error) {
+      alert(`Error ${action}ing leave request: ` + error.message);
+      const revertedSet = new Set(disabledButtons);
+      revertedSet.delete(leaveId);
+      setDisabledButtons(revertedSet);
+      localStorage.setItem('disabledLeaveButtons', JSON.stringify([...revertedSet]));
+    }
+  };
 
   const fetchAdminCount = async () => {
     try {
@@ -58,7 +122,7 @@ const ManagerDashboard = ({ onLogout }) => {
 
       const response = await fetch(`http://localhost:3001/api/auth/appointments-by-date?${params}`);
       const result = await response.json();
-      
+
       if (result.success) {
         setAppointmentCount(result.count);
       }
@@ -226,6 +290,94 @@ const ManagerDashboard = ({ onLogout }) => {
     );
   }
 
+  if (showAdminLeaves) {
+    return (
+      <div className="admin-leaves-container">
+        <div className="container-fluid h-100">
+          <div className="row justify-content-center align-items-center min-vh-100">
+            <div className="col-md-10 col-lg-8">
+              <div className="admin-list-card">
+                <div className="d-flex justify-content-between align-items-center mb-4">
+                  <h3>Admin Leave Requests ({adminLeaves.length})</h3>
+                  <button
+                    className="btn btn-outline-secondary"
+                    onClick={() => setShowAdminLeaves(false)}
+                  >
+                    <i className="fas fa-times"></i>
+                  </button>
+                </div>
+
+                {adminLeaves.length === 0 ? (
+                  <div className="text-center py-5">
+                    <i className="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                    <h5>No Leave Requests</h5>
+                    <p className="text-muted">No admin leave requests found.</p>
+                  </div>
+                ) : (
+                  <div className="admin-cards">
+                    {adminLeaves.map((leave) => (
+                      <div key={leave.id} className="admin-detail-card mb-3">
+                        <div className="row align-items-center">
+                          <div className="col-md-2 text-center">
+                            <div className="admin-avatar">
+                              <i className="fas fa-calendar-times fa-2x text-warning"></i>
+                            </div>
+                          </div>
+                          <div className="col-md-8">
+                            <div className="admin-info">
+                              <h5 className="mb-1">{leave.adminName}</h5>
+                              <p className="text-muted mb-1">
+                                <i className="fas fa-calendar me-2"></i>
+                                Leave Date: {new Date(leave.leaveDate).toLocaleDateString()}
+                              </p>
+                              <p className="text-muted mb-1">
+                                <i className="fas fa-comment me-2"></i>
+                                Reason: {leave.reason}
+                              </p>
+                              <p className="text-muted mb-1">
+                                <i className="fas fa-clock me-2"></i>
+                                Requested: {new Date(leave.createdAt).toLocaleDateString()}
+                              </p>
+                              <span className={`badge ${leave.status === 'approved' ? 'bg-success' :
+                                leave.status === 'rejected' ? 'bg-danger' : 'bg-warning'
+                                }`}>
+                                {leave.status?.toUpperCase() || 'PENDING'}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="col-md-2 text-end">
+                            <div className="btn-group-vertical" role="group">
+                              <button
+                                className="btn btn-success btn-sm mb-2"
+                                onClick={() => handleLeaveAction(leave.id, 'approved')}
+                                disabled={disabledButtons.has(leave.id)}
+                              >
+                                <i className="fas fa-check me-1"></i>
+                                Approve
+                              </button>
+                              <button
+                                className="btn btn-danger btn-sm"
+                                onClick={() => handleLeaveAction(leave.id, 'rejected')}
+                                disabled={disabledButtons.has(leave.id)}
+                              >
+                                <i className="fas fa-times me-1"></i>
+                                Reject
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (showAdminList) {
     return (
       <div className="admin-list-container">
@@ -242,7 +394,7 @@ const ManagerDashboard = ({ onLogout }) => {
                     <i className="fas fa-times"></i>
                   </button>
                 </div>
-                
+
                 <div className="admin-cards">
                   {adminList.map((admin) => (
                     <div key={admin.id} className="admin-detail-card mb-3">
@@ -439,6 +591,12 @@ const ManagerDashboard = ({ onLogout }) => {
                   <a className="nav-link" href="#" onClick={handleAppointmentCardClick}>
                     <i className="fas fa-calendar-alt me-2"></i>
                     Appointments
+                  </a>
+                </li>
+                <li className="nav-item mb-2">
+                  <a className="nav-link" href="#" onClick={handleAdminLeavesClick}>
+                    <i className="fas fa-calendar-times me-2"></i>
+                    Admin Leaves
                   </a>
                 </li>
                 <li className="nav-item mb-2">

@@ -73,9 +73,9 @@ const Login = () => {
             if (adminResponse.ok && adminResult.success) {
                 setIsAdmin(true);
                 setAdminData(adminResult.admin);
-                localStorage.setItem('authData', JSON.stringify({ 
-                    userType: 'admin', 
-                    userData: adminResult.admin 
+                localStorage.setItem('authData', JSON.stringify({
+                    userType: 'admin',
+                    userData: adminResult.admin
                 }));
                 return;
             }
@@ -98,9 +98,9 @@ const Login = () => {
             if (patientResponse.ok && patientResult.success) {
                 setIsPatient(true);
                 setPatientData(patientResult.patient);
-                localStorage.setItem('authData', JSON.stringify({ 
-                    userType: 'patient', 
-                    userData: patientResult.patient 
+                localStorage.setItem('authData', JSON.stringify({
+                    userType: 'patient',
+                    userData: patientResult.patient
                 }));
                 return;
             }
@@ -158,7 +158,7 @@ const Login = () => {
                                     onClick={handleBackToHome}
                                 >
                                     <i className="fas fa-arrow-left me-2"></i>
-                                    Back to Home
+
                                 </button>
                                 <h2 className="login-title">Welcome Back</h2>
                                 <p className="login-subtitle">Sign in to access your healthcare dashboard</p>

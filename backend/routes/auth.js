@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const { Admin, Patient, Appointment, ClinicSetting, Holiday, DoctorLeave, MedicalRecord } = require('../models');
+const { Admin, Patient, Appointment, ClinicSetting, Holiday, DoctorLeave, MedicalRecord, AdminLeave } = require('../models');
 const { Op } = require('sequelize');
 const { adminRegistrationSchema, patientRegistrationSchema, loginSchema, appointmentSchema } = require('../validators/authValidators');
 const router = express.Router();
@@ -64,11 +64,11 @@ setInterval(cleanupOldAppointments, 60 * 60 * 1000);
 router.post('/register-admin', async (req, res) => {
   try {
     const { error, value } = adminRegistrationSchema.validate(req.body);
-    
+
     if (error) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: error.details[0].message 
+        message: error.details[0].message
       });
     }
 
@@ -112,11 +112,11 @@ router.post('/register-admin', async (req, res) => {
 router.post('/login-admin', async (req, res) => {
   try {
     const { error, value } = loginSchema.validate(req.body);
-    
+
     if (error) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: error.details[0].message 
+        message: error.details[0].message
       });
     }
 
@@ -162,11 +162,11 @@ router.post('/login-admin', async (req, res) => {
 router.post('/register-patient', async (req, res) => {
   try {
     const { error, value } = patientRegistrationSchema.validate(req.body);
-    
+
     if (error) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: error.details[0].message 
+        message: error.details[0].message
       });
     }
 
@@ -208,11 +208,11 @@ router.post('/register-patient', async (req, res) => {
 router.post('/login-patient', async (req, res) => {
   try {
     const { error, value } = loginSchema.validate(req.body);
-    
+
     if (error) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: error.details[0].message 
+        message: error.details[0].message
       });
     }
 
@@ -257,11 +257,11 @@ router.post('/login-patient', async (req, res) => {
 router.post('/book-appointment', async (req, res) => {
   try {
     const { error, value } = appointmentSchema.validate(req.body);
-    
+
     if (error) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: error.details[0].message 
+        message: error.details[0].message
       });
     }
 
@@ -391,10 +391,10 @@ router.get('/admin-appointments-by-date', async (req, res) => {
       // Specific date - exclude if it's today
       const startDate = new Date(year, month - 1, date);
       const endDate = new Date(year, month - 1, date, 23, 59, 59);
-      
+
       // Check if the requested date is today
       const isToday = startDate.getTime() >= todayStart.getTime() && startDate.getTime() <= todayEnd.getTime();
-      
+
       if (isToday) {
         // Return empty result if requesting today's date
         return res.json({
@@ -404,7 +404,7 @@ router.get('/admin-appointments-by-date', async (req, res) => {
           count: 0
         });
       }
-      
+
       whereClause.appointmentDate = {
         [Op.between]: [startDate, endDate]
       };
@@ -826,21 +826,21 @@ router.get('/check-doctor-leave', async (req, res) => {
 router.post('/upload-medical-record', upload.single('medicalFile'), async (req, res) => {
   try {
     const { patientId, recordType, title, description, uploadedBy } = req.body;
-    
+
     if (!req.file) {
       return res.status(400).json({
         success: false,
         message: 'Please select a PDF file to upload'
       });
     }
-    
+
     if (!patientId || !recordType || !title || !uploadedBy) {
       return res.status(400).json({
         success: false,
         message: 'Patient ID, record type, title, and uploader name are required'
       });
     }
-    
+
     const medicalRecord = await MedicalRecord.create({
       patientId: parseInt(patientId),
       recordType,
@@ -851,7 +851,7 @@ router.post('/upload-medical-record', upload.single('medicalFile'), async (req, 
       fileSize: req.file.size,
       uploadedBy
     });
-    
+
     res.json({
       success: true,
       message: 'Medical record uploaded successfully',
@@ -876,12 +876,12 @@ router.post('/upload-medical-record', upload.single('medicalFile'), async (req, 
 router.get('/patient-medical-records/:patientId', async (req, res) => {
   try {
     const { patientId } = req.params;
-    
+
     const records = await MedicalRecord.findAll({
       where: { patientId },
       order: [['createdAt', 'DESC']]
     });
-    
+
     res.json({
       success: true,
       records: records
@@ -899,26 +899,26 @@ router.get('/patient-medical-records/:patientId', async (req, res) => {
 router.get('/download-medical-record/:recordId', async (req, res) => {
   try {
     const { recordId } = req.params;
-    
+
     const record = await MedicalRecord.findByPk(recordId);
-    
+
     if (!record) {
       return res.status(404).json({
         success: false,
         message: 'Medical record not found'
       });
     }
-    
+
     if (!fs.existsSync(record.filePath)) {
       return res.status(404).json({
         success: false,
         message: 'File not found on server'
       });
     }
-    
+
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${record.fileName}"`);
-    
+
     const fileStream = fs.createReadStream(record.filePath);
     fileStream.pipe(res);
   } catch (error) {
@@ -937,7 +937,7 @@ router.get('/all-patients', async (req, res) => {
       attributes: ['id', 'fullName', 'email', 'createdAt'],
       order: [['fullName', 'ASC']]
     });
-    
+
     res.json({
       success: true,
       patients: patients
@@ -946,6 +946,123 @@ router.get('/all-patients', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error fetching patients',
+      error: error.message
+    });
+  }
+});
+
+// Add admin leave
+router.post('/admin-leaves', async (req, res) => {
+  try {
+    const { adminName, leaveDate, reason } = req.body;
+
+    // Check if admin already has leave request for this date
+    const existingLeave = await AdminLeave.findOne({
+      where: {
+        adminName: adminName,
+        leaveDate: leaveDate,
+        isActive: true
+      }
+    });
+
+    if (existingLeave) {
+      return res.status(400).json({
+        success: false,
+        message: 'You already have a leave request for this date'
+      });
+    }
+
+    const leave = await AdminLeave.create({
+      adminName,
+      leaveDate,
+      reason,
+      isActive: true,
+      status: 'pending'
+    });
+
+    res.json({
+      success: true,
+      message: 'Admin leave added successfully',
+      leave: leave
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error adding admin leave',
+      error: error.message
+    });
+  }
+});
+
+// Get admin leaves
+router.get('/admin-leaves', async (req, res) => {
+  try {
+    const leaves = await AdminLeave.findAll({
+      where: { isActive: true },
+      order: [['leaveDate', 'ASC']]
+    });
+
+    res.json({
+      success: true,
+      leaves: leaves
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching admin leaves',
+      error: error.message
+    });
+  }
+});
+
+// Update admin leave status
+router.put('/admin-leaves/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    await AdminLeave.update(
+      { status: status },
+      { where: { id } }
+    );
+
+    res.json({
+      success: true,
+      message: `Leave request ${status} successfully`
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error updating leave status',
+      error: error.message
+    });
+  }
+});
+
+// Get admin leave status
+router.get('/admin-leaves-status/:adminName', async (req, res) => {
+  try {
+    const { adminName } = req.params;
+
+    const leave = await AdminLeave.findOne({
+      where: {
+        adminName: adminName,
+        isActive: true,
+        status: {
+          [Op.ne]: 'pending'
+        }
+      },
+      order: [['createdAt', 'DESC']]
+    });
+
+    res.json({
+      success: true,
+      leave: leave
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching leave status',
       error: error.message
     });
   }
