@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 const MedicalRecords = ({ onBack, patientData }) => {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showPdfPopup, setShowPdfPopup] = useState(false);
+  const [currentPdfUrl, setCurrentPdfUrl] = useState('');
 
   useEffect(() => {
     fetchMedicalRecords();
@@ -21,6 +23,17 @@ const MedicalRecords = ({ onBack, patientData }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const viewRecord = (recordId) => {
+    const viewUrl = `http://localhost:3001/api/auth/view-medical-record/${recordId}`;
+    setCurrentPdfUrl(viewUrl);
+    setShowPdfPopup(true);
+  };
+
+  const closePdfPopup = () => {
+    setShowPdfPopup(false);
+    setCurrentPdfUrl('');
   };
 
   const downloadRecord = async (recordId, fileName) => {
@@ -114,12 +127,20 @@ const MedicalRecords = ({ onBack, patientData }) => {
                           <small className="text-muted">{(record.fileSize / 1024).toFixed(1)} KB</small>
                         </div>
                         <div className="col-md-2 text-end">
-                          <button 
-                            className="btn btn-primary btn-sm"
-                            onClick={() => downloadRecord(record.id, record.fileName)}
-                          >
-                            <i className="fas fa-download me-1"></i>Download
-                          </button>
+                          <div className="btn-group-vertical" role="group">
+                            <button 
+                              className="btn btn-outline-primary btn-sm mb-1"
+                              onClick={() => viewRecord(record.id)}
+                            >
+                              <i className="fas fa-eye me-1"></i>View
+                            </button>
+                            <button 
+                              className="btn btn-primary btn-sm"
+                              onClick={() => downloadRecord(record.id, record.fileName)}
+                            >
+                              <i className="fas fa-download me-1"></i>Download
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -130,6 +151,34 @@ const MedicalRecords = ({ onBack, patientData }) => {
           </div>
         </div>
       </div>
+
+      {/* PDF Popup Modal */}
+      {showPdfPopup && (
+        <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.8)' }}>
+          <div className="modal-dialog modal-xl modal-dialog-centered">
+            <div className="modal-content" style={{ height: '90vh' }}>
+              <div className="modal-header">
+                <h5 className="modal-title">
+                  <i className="fas fa-file-pdf me-2"></i>
+                  Medical Report Viewer
+                </h5>
+                <button type="button" className="btn-close" onClick={closePdfPopup}></button>
+              </div>
+              <div className="modal-body p-0" style={{ height: 'calc(90vh - 120px)' }}>
+                <iframe
+                  src={currentPdfUrl}
+                  width="100%"
+                  height="100%"
+                  style={{ border: 'none' }}
+                  title="Medical Report"
+                >
+                  <p>Your browser does not support PDFs. <a href={currentPdfUrl} target="_blank" rel="noopener noreferrer">Download the PDF</a>.</p>
+                </iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

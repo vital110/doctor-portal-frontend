@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './ManagerDashboard.css';
 import './AdminForm.css';
+import './SubmitSalaryForm.css';
+import './SalaryList.css';
 
 const ManagerDashboard = ({ onLogout }) => {
   const [showAdminForm, setShowAdminForm] = useState(false);
@@ -25,6 +27,21 @@ const ManagerDashboard = ({ onLogout }) => {
   const [disabledButtons, setDisabledButtons] = useState(() => {
     const saved = localStorage.getItem('disabledLeaveButtons');
     return saved ? new Set(JSON.parse(saved)) : new Set();
+  });
+  const [showSalaryForm, setShowSalaryForm] = useState(false);
+  const [salaryFormData, setSalaryFormData] = useState({
+    adminName: '',
+    amount: '',
+    month: '',
+    year: new Date().getFullYear()
+  });
+  const [showSalaryList, setShowSalaryList] = useState(false);
+  const [salaryList, setSalaryList] = useState([]);
+  const [filteredSalaryList, setFilteredSalaryList] = useState([]);
+  const [salaryFilter, setSalaryFilter] = useState({
+    adminName: '',
+    month: '',
+    year: ''
   });
 
   useEffect(() => {
@@ -191,6 +208,96 @@ const ManagerDashboard = ({ onLogout }) => {
     } catch (error) {
       alert('Error: ' + error.message);
     }
+  };
+
+  const handleSalaryFormChange = (e) => {
+    setSalaryFormData({
+      ...salaryFormData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSalarySubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch('http://localhost:3001/api/auth/admin-salaries', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...salaryFormData,
+          submittedBy: 'Manager'
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert('Admin salary submitted successfully!');
+        setShowSalaryForm(false);
+        setSalaryFormData({ adminName: '', amount: '', month: '', year: new Date().getFullYear() });
+      } else {
+        alert(result.message || 'Failed to submit salary');
+      }
+    } catch (error) {
+      alert('Error submitting salary: ' + error.message);
+    }
+  };
+
+  const fetchSalaryList = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/api/auth/all-admin-salaries');
+      const result = await response.json();
+      if (result.success) {
+        setSalaryList(result.salaries);
+        setFilteredSalaryList(result.salaries);
+      }
+    } catch (error) {
+      console.error('Error fetching salary list:', error);
+    }
+  };
+
+  const handleSalaryListClick = () => {
+    fetchSalaryList();
+    setShowSalaryList(true);
+  };
+
+  const handleSalaryFilterChange = (e) => {
+    setSalaryFilter({
+      ...salaryFilter,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const applySalaryFilter = () => {
+    let filtered = salaryList;
+    
+    if (salaryFilter.adminName) {
+      filtered = filtered.filter(salary => 
+        salary.adminName.toLowerCase().includes(salaryFilter.adminName.toLowerCase())
+      );
+    }
+    
+    if (salaryFilter.month) {
+      filtered = filtered.filter(salary => 
+        salary.month.toString() === salaryFilter.month
+      );
+    }
+    
+    if (salaryFilter.year) {
+      filtered = filtered.filter(salary => 
+        salary.year.toString() === salaryFilter.year
+      );
+    }
+    
+    setFilteredSalaryList(filtered);
+  };
+
+  const clearSalaryFilter = () => {
+    setSalaryFilter({ adminName: '', month: '', year: '' });
+    setFilteredSalaryList(salaryList);
   };
 
   if (showAppointmentFilter) {
@@ -432,6 +539,291 @@ const ManagerDashboard = ({ onLogout }) => {
     );
   }
 
+  if (showSalaryList) {
+    const displayList = filteredSalaryList;
+    const totalAmount = displayList.reduce((sum, salary) => sum + parseFloat(salary.amount), 0);
+    
+    return (
+      <div className="salary-list-container">
+        <div className="container-fluid h-100">
+          <div className="row justify-content-center align-items-center min-vh-100">
+            <div className="col-md-10 col-lg-8">
+              <div className="salary-list-card">
+                <div className="salary-list-header">
+                  <button
+                    className="salary-list-back-btn"
+                    onClick={() => setShowSalaryList(false)}
+                  >
+                    <i className="fas fa-times me-2"></i>
+                    Close
+                  </button>
+                  <h2><i className="fas fa-list-alt me-2"></i>Submitted Salaries</h2>
+                  <p>Complete list of admin salary submissions</p>
+                </div>
+
+                <div className="salary-list-content">
+                  {/* Filter Section */}
+                  <div className="salary-filter-section">
+                    <div className="row g-2">
+                      <div className="col-md-4">
+                        <input
+                          type="text"
+                          className="salary-filter-input"
+                          placeholder="Admin Name"
+                          name="adminName"
+                          value={salaryFilter.adminName}
+                          onChange={handleSalaryFilterChange}
+                        />
+                      </div>
+                      <div className="col-md-3">
+                        <select
+                          className="salary-filter-input"
+                          name="month"
+                          value={salaryFilter.month}
+                          onChange={handleSalaryFilterChange}
+                        >
+                          <option value="">All Months</option>
+                          <option value="1">January</option>
+                          <option value="2">February</option>
+                          <option value="3">March</option>
+                          <option value="4">April</option>
+                          <option value="5">May</option>
+                          <option value="6">June</option>
+                          <option value="7">July</option>
+                          <option value="8">August</option>
+                          <option value="9">September</option>
+                          <option value="10">October</option>
+                          <option value="11">November</option>
+                          <option value="12">December</option>
+                        </select>
+                      </div>
+                      <div className="col-md-2">
+                        <input
+                          type="number"
+                          className="salary-filter-input"
+                          placeholder="Year"
+                          name="year"
+                          value={salaryFilter.year}
+                          onChange={handleSalaryFilterChange}
+                          min="2020"
+                          max="2030"
+                        />
+                      </div>
+                      <div className="col-md-3">
+                        <div className="d-flex gap-2">
+                          <button
+                            className="salary-filter-btn btn btn-primary"
+                            onClick={applySalaryFilter}
+                          >
+                            <i className="fas fa-search me-1"></i>Filter
+                          </button>
+                          <button
+                            className="salary-filter-btn btn btn-outline-secondary"
+                            onClick={clearSalaryFilter}
+                          >
+                            <i className="fas fa-times me-1"></i>Clear
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {displayList.length > 0 && (
+                    <div className="salary-list-stats">
+                      <div className="salary-list-total">${totalAmount.toFixed(2)}</div>
+                      <div className="salary-list-count">Total from {displayList.length} submission{displayList.length !== 1 ? 's' : ''}</div>
+                    </div>
+                  )}
+
+                  {displayList.length === 0 ? (
+                    <div className="salary-list-empty-state">
+                      <i className="fas fa-dollar-sign"></i>
+                      <h5>No Salaries Found</h5>
+                      <p>{salaryList.length === 0 ? 'No admin salaries have been submitted yet.' : 'No salaries match the current filter criteria.'}</p>
+                    </div>
+                  ) : (
+                    <div className="salary-list-items">
+                      {displayList.map((salary) => (
+                        <div key={salary.id} className="salary-list-item">
+                          <div className="row align-items-center">
+                            <div className="col-md-2 text-center">
+                              <div className="salary-list-icon">
+                                <i className="fas fa-check-circle fa-lg"></i>
+                              </div>
+                            </div>
+                            <div className="col-md-10">
+                              <div className="salary-list-amount">${parseFloat(salary.amount).toFixed(2)}</div>
+                              <div className="salary-list-detail">
+                                <i className="fas fa-user"></i>
+                                <strong>Admin:</strong> {salary.adminName}
+                              </div>
+                              <div className="salary-list-detail">
+                                <i className="fas fa-calendar"></i>
+                                <strong>Period:</strong> {new Date(0, salary.month - 1).toLocaleString('default', { month: 'long' })} {salary.year}
+                              </div>
+                              <div className="salary-list-detail">
+                                <i className="fas fa-clock"></i>
+                                <strong>Submitted:</strong> {new Date(salary.createdAt).toLocaleDateString()} at {new Date(salary.createdAt).toLocaleTimeString()}
+                              </div>
+                              <div className="salary-list-detail">
+                                <i className="fas fa-user-tie"></i>
+                                <strong>By:</strong> {salary.submittedBy} <span className="salary-list-badge">Credited</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (showSalaryForm) {
+    return (
+      <div className="salary-form-container">
+        <div className="container-fluid h-100">
+          <div className="row justify-content-center align-items-center min-vh-100">
+            <div className="col-md-8 col-lg-6">
+              <div className="salary-form-card">
+                <div className="salary-form-header">
+                  <button
+                    className="salary-back-btn"
+                    onClick={() => setShowSalaryForm(false)}
+                  >
+                    <i className="fas fa-arrow-left me-2"></i>
+                    Back to Dashboard
+                  </button>
+                  <h2><i className="fas fa-dollar-sign me-2"></i>Submit Admin Salary</h2>
+                  <p>Credit salary to admin account</p>
+                </div>
+
+                <div className="salary-form-content">
+                  <form onSubmit={handleSalarySubmit}>
+                    <div className="salary-form-group">
+                      <label className="salary-form-label">Admin Name *</label>
+                      <input
+                        type="text"
+                        className="salary-form-input"
+                        name="adminName"
+                        value={salaryFormData.adminName}
+                        onChange={handleSalaryFormChange}
+                        placeholder="Enter admin full name"
+                        required
+                      />
+                    </div>
+
+                    <div className="salary-form-group">
+                      <label className="salary-form-label">Salary Amount *</label>
+                      <div className="salary-amount-group">
+                        <span className="salary-amount-prefix">$</span>
+                        <input
+                          type="number"
+                          className="salary-form-input salary-amount-input"
+                          name="amount"
+                          value={salaryFormData.amount}
+                          onChange={handleSalaryFormChange}
+                          placeholder="0.00"
+                          step="0.01"
+                          min="0"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="salary-form-group">
+                      <label className="salary-form-label">Month *</label>
+                      <div className="salary-month-buttons">
+                        <div className="salary-month-btn-group">
+                          <button
+                            type="button"
+                            className="salary-month-btn previous"
+                            onClick={() => {
+                              const prevMonth = new Date().getMonth() === 0 ? 12 : new Date().getMonth();
+                              const prevYear = new Date().getMonth() === 0 ? new Date().getFullYear() - 1 : new Date().getFullYear();
+                              setSalaryFormData({...salaryFormData, month: prevMonth.toString(), year: prevYear});
+                            }}
+                          >
+                            Previous Month
+                          </button>
+                          <button
+                            type="button"
+                            className="salary-month-btn current"
+                            onClick={() => {
+                              setSalaryFormData({...salaryFormData, month: (new Date().getMonth() + 1).toString(), year: new Date().getFullYear()});
+                            }}
+                          >
+                            Current Month
+                          </button>
+                          <button
+                            type="button"
+                            className="salary-month-btn advance"
+                            onClick={() => {
+                              const nextMonth = new Date().getMonth() === 11 ? 1 : new Date().getMonth() + 2;
+                              const nextYear = new Date().getMonth() === 11 ? new Date().getFullYear() + 1 : new Date().getFullYear();
+                              setSalaryFormData({...salaryFormData, month: nextMonth.toString(), year: nextYear});
+                            }}
+                          >
+                            Advance Month
+                          </button>
+                        </div>
+                      </div>
+                      <select
+                        className="salary-form-select"
+                        name="month"
+                        value={salaryFormData.month}
+                        onChange={handleSalaryFormChange}
+                        required
+                      >
+                        <option value="">Select month</option>
+                        <option value="1">January</option>
+                        <option value="2">February</option>
+                        <option value="3">March</option>
+                        <option value="4">April</option>
+                        <option value="5">May</option>
+                        <option value="6">June</option>
+                        <option value="7">July</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                      </select>
+                    </div>
+
+                    <div className="salary-form-group">
+                      <label className="salary-form-label">Year *</label>
+                      <input
+                        type="number"
+                        className="salary-form-input"
+                        name="year"
+                        value={salaryFormData.year}
+                        onChange={handleSalaryFormChange}
+                        min="2020"
+                        max="2030"
+                        required
+                      />
+                    </div>
+
+                    <button type="submit" className="salary-submit-btn">
+                      <i className="fas fa-credit-card me-2"></i>
+                      Submit Salary
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (showAdminForm) {
     return (
       <div className="admin-form-container">
@@ -600,6 +992,18 @@ const ManagerDashboard = ({ onLogout }) => {
                   </a>
                 </li>
                 <li className="nav-item mb-2">
+                  <a className="nav-link" href="#" onClick={() => setShowSalaryForm(true)}>
+                    <i className="fas fa-dollar-sign me-2"></i>
+                    Submit Salary
+                  </a>
+                </li>
+                <li className="nav-item mb-2">
+                  <a className="nav-link" href="#" onClick={handleSalaryListClick}>
+                    <i className="fas fa-list-alt me-2"></i>
+                    Salary List
+                  </a>
+                </li>
+                <li className="nav-item mb-2">
                   <a className="nav-link" href="#">
                     <i className="fas fa-chart-bar me-2"></i>
                     Reports
@@ -711,6 +1115,13 @@ const ManagerDashboard = ({ onLogout }) => {
                         >
                           <i className="fas fa-calendar-search me-2"></i>
                           Filter Appointments
+                        </button>
+                        <button
+                          className="btn btn-success"
+                          onClick={() => setShowSalaryForm(true)}
+                        >
+                          <i className="fas fa-dollar-sign me-2"></i>
+                          Submit Admin Salary
                         </button>
                         <button className="btn btn-info">
                           <i className="fas fa-file-alt me-2"></i>

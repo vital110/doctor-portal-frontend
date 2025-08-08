@@ -5,6 +5,9 @@ const PatientDashboard = ({ onLogout, patientData }) => {
   const [showAppointmentForm, setShowAppointmentForm] = useState(false);
   const [showAppointments, setShowAppointments] = useState(false);
   const [showMedicalRecords, setShowMedicalRecords] = useState(false);
+  const [showUploadDocument, setShowUploadDocument] = useState(false);
+  const [showMyDocuments, setShowMyDocuments] = useState(false);
+  const [myDocuments, setMyDocuments] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [appointmentData, setAppointmentData] = useState({
     doctorName: '',
@@ -95,6 +98,195 @@ const PatientDashboard = ({ onLogout, patientData }) => {
       alert('Error fetching appointments: ' + error.message);
     }
   };
+
+  if (showMyDocuments) {
+    return (
+      <div className="my-documents-container">
+        <div className="container-fluid h-100">
+          <div className="row justify-content-center align-items-center min-vh-100">
+            <div className="col-md-10 col-lg-8">
+              <div className="my-documents-card">
+                <div className="d-flex justify-content-between align-items-center mb-4">
+                  <div>
+                    <h3><i className="fas fa-folder-open me-2"></i>My Documents</h3>
+                    <p className="text-muted mb-0">Your uploaded medical documents ({myDocuments.length})</p>
+                  </div>
+                  <button className="btn btn-outline-secondary" onClick={() => setShowMyDocuments(false)}>
+                    <i className="fas fa-arrow-left me-2"></i>Back to Upload
+                  </button>
+                </div>
+
+                {myDocuments.length === 0 ? (
+                  <div className="text-center py-5">
+                    <i className="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                    <h5>No Documents Found</h5>
+                    <p className="text-muted">You haven't uploaded any documents yet.</p>
+                  </div>
+                ) : (
+                  <div className="documents-list">
+                    {myDocuments.map((doc) => (
+                      <div key={doc.id} className="document-card mb-3 p-3 border rounded">
+                        <div className="row align-items-center">
+                          <div className="col-md-1">
+                            <i className="fas fa-file-pdf fa-2x text-danger"></i>
+                          </div>
+                          <div className="col-md-9">
+                            <h6 className="mb-1">{doc.title}</h6>
+                            <p className="text-muted mb-1 small">{doc.description || 'No description provided'}</p>
+                            <div className="d-flex gap-3 small text-muted">
+                              <span><i className="fas fa-calendar me-1"></i>{new Date(doc.createdAt).toLocaleDateString()}</span>
+                              <span><i className="fas fa-file me-1"></i>{doc.fileName}</span>
+                              <span><i className="fas fa-weight me-1"></i>{(doc.fileSize / 1024).toFixed(1)} KB</span>
+                            </div>
+                          </div>
+                          <div className="col-md-2 text-end">
+                            <button 
+                              className="btn btn-danger btn-sm"
+                              onClick={async () => {
+                                if (window.confirm('Are you sure you want to delete this document?')) {
+                                  try {
+                                    const response = await fetch(`http://localhost:3001/api/auth/patient-document/${doc.id}`, {
+                                      method: 'DELETE'
+                                    });
+                                    
+                                    const result = await response.json();
+                                    
+                                    if (result.success) {
+                                      setMyDocuments(prev => prev.filter(d => d.id !== doc.id));
+                                      alert('Document deleted successfully!');
+                                    } else {
+                                      alert(result.message || 'Failed to delete document');
+                                    }
+                                  } catch (error) {
+                                    alert('Error deleting document: ' + error.message);
+                                  }
+                                }
+                              }}
+                            >
+                              <i className="fas fa-trash me-1"></i>Delete
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (showUploadDocument) {
+    return (
+      <div className="upload-document-container">
+        <div className="container-fluid h-100">
+          <div className="row justify-content-center align-items-center min-vh-100">
+            <div className="col-md-6 col-lg-5">
+              <div className="upload-document-card">
+                <div className="text-center mb-4">
+                  <button
+                    className="back-btn"
+                    onClick={() => setShowUploadDocument(false)}
+                  >
+                    <i className="fas fa-arrow-left me-2"></i>
+                    Back to Dashboard
+                  </button>
+                  <h2><i className="fas fa-cloud-upload-alt me-2"></i>Upload Document</h2>
+                  <p className="text-muted">Upload your personal medical documents</p>
+                </div>
+
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  const formData = new FormData(e.target);
+                  formData.append('patientId', patientData.id);
+                  
+                  try {
+                    const response = await fetch('http://localhost:3001/api/auth/upload-patient-document', {
+                      method: 'POST',
+                      body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                      alert('Document uploaded successfully!');
+                      setShowUploadDocument(false);
+                    } else {
+                      alert(result.message || 'Upload failed');
+                    }
+                  } catch (error) {
+                    alert('Error uploading document: ' + error.message);
+                  }
+                }}>
+                  <div className="mb-3">
+                    <label className="form-label fw-semibold">Document Title *</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="title"
+                      placeholder="Enter document title"
+                      required
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label fw-semibold">Description</label>
+                    <textarea
+                      className="form-control"
+                      name="description"
+                      placeholder="Brief description (optional)"
+                      rows="3"
+                    ></textarea>
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="form-label fw-semibold">Select PDF File *</label>
+                    <input
+                      type="file"
+                      className="form-control"
+                      name="documentFile"
+                      accept=".pdf"
+                      required
+                    />
+                    <div className="form-text">Only PDF files are allowed (Max: 10MB)</div>
+                  </div>
+
+                  <div className="d-grid gap-2">
+                    <button type="submit" className="btn btn-primary py-3">
+                      <i className="fas fa-upload me-2"></i>
+                      Upload Document
+                    </button>
+                    <button 
+                      type="button" 
+                      className="btn btn-outline-secondary py-2"
+                      onClick={async () => {
+                        try {
+                          const response = await fetch(`http://localhost:3001/api/auth/patient-documents/${patientData.id}`);
+                          const result = await response.json();
+                          if (result.success) {
+                            setMyDocuments(result.documents);
+                            setShowMyDocuments(true);
+                          }
+                        } catch (error) {
+                          alert('Error fetching documents: ' + error.message);
+                        }
+                      }}
+                    >
+                      <i className="fas fa-eye me-2"></i>
+                      View My Documents
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (showMedicalRecords) {
     return <MedicalRecords onBack={() => setShowMedicalRecords(false)} patientData={patientData} />;
@@ -346,6 +538,12 @@ const PatientDashboard = ({ onLogout, patientData }) => {
                   </a>
                 </li>
                 <li className="nav-item mb-2">
+                  <a className="nav-link" href="#" onClick={() => setShowUploadDocument(true)}>
+                    <i className="fas fa-cloud-upload-alt me-2"></i>
+                    Upload Document
+                  </a>
+                </li>
+                <li className="nav-item mb-2">
                   <a className="nav-link" href="#">
                     <i className="fas fa-user-md me-2"></i>
                     My Doctors
@@ -412,9 +610,12 @@ const PatientDashboard = ({ onLogout, patientData }) => {
                       </button>
                     </div>
                     <div className="col-md-3 mb-3">
-                      <button className="btn btn-info w-100">
-                        <i className="fas fa-comments me-2"></i>
-                        Messages
+                      <button 
+                        className="btn btn-secondary w-100"
+                        onClick={() => setShowUploadDocument(true)}
+                      >
+                        <i className="fas fa-cloud-upload-alt me-2"></i>
+                        Upload Document
                       </button>
                     </div>
                   </div>

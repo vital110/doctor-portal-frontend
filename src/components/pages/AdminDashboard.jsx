@@ -3,6 +3,7 @@ import SystemSettings from './SystemSettings';
 import UploadMedicalRecord from './UploadMedicalRecord';
 import './AdminDashboard.css';
 import './PreviousAppointments.css';
+import './PaymentHistory.css';
 
 const AdminDashboard = ({ onLogout, adminData }) => {
   const timeoutRef = useRef(null);
@@ -26,6 +27,12 @@ const AdminDashboard = ({ onLogout, adminData }) => {
   const [filteredAppointments, setFilteredAppointments] = useState([]);
   const [filterDescription, setFilterDescription] = useState('');
   const [leaveStatusPopup, setLeaveStatusPopup] = useState(null);
+  const [salaryStatusPopup, setSalaryStatusPopup] = useState(null);
+  const [showPatientDocs, setShowPatientDocs] = useState(false);
+  const [patientDocs, setPatientDocs] = useState([]);
+  const [selectedPatientName, setSelectedPatientName] = useState('');
+  const [showPaymentHistory, setShowPaymentHistory] = useState(false);
+  const [paymentHistory, setPaymentHistory] = useState([]);
 
   const resetTimeout = () => {
     if (timeoutRef.current) {
@@ -40,8 +47,10 @@ const AdminDashboard = ({ onLogout, adminData }) => {
   useEffect(() => {
     fetchTodayAppointments();
     checkLeaveStatus();
+    checkSalaryStatus();
     const interval = setInterval(fetchTodayAppointments, 5 * 60 * 1000);
     const leaveInterval = setInterval(checkLeaveStatus, 30 * 1000);
+    const salaryInterval = setInterval(checkSalaryStatus, 30 * 1000);
     
     // Set up auto-logout
     resetTimeout();
@@ -57,6 +66,7 @@ const AdminDashboard = ({ onLogout, adminData }) => {
     return () => {
       clearInterval(interval);
       clearInterval(leaveInterval);
+      clearInterval(salaryInterval);
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
@@ -202,8 +212,94 @@ const AdminDashboard = ({ onLogout, adminData }) => {
     }
   };
 
+  const checkSalaryStatus = async () => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/auth/admin-salary-status/${adminData?.fullName || 'Admin'}`);
+      const result = await response.json();
+      
+      if (result.success && result.salary) {
+        const lastChecked = localStorage.getItem(`lastSalaryCheck_${result.salary.id}`);
+        
+        if (!lastChecked) {
+          setSalaryStatusPopup(result.salary);
+          localStorage.setItem(`lastSalaryCheck_${result.salary.id}`, 'seen');
+        }
+      }
+    } catch (error) {
+      console.error('Error checking salary status:', error);
+    }
+  };
+
   const closeLeavePopup = () => {
     setLeaveStatusPopup(null);
+  };
+
+  const closeSalaryPopup = () => {
+    setSalaryStatusPopup(null);
+  };
+
+  const viewPatientDocs = async (patientId, patientName) => {
+    if (!patientId) {
+      alert('Patient ID not found');
+      return;
+    }
+    
+    try {
+      const response = await fetch(`http://localhost:3001/api/auth/patient-documents/${patientId}`);
+      const result = await response.json();
+      if (result.success) {
+        setPatientDocs(result.documents);
+        setSelectedPatientName(patientName);
+        setShowPatientDocs(true);
+      }
+    } catch (error) {
+      console.error('Error fetching patient documents:', error);
+      alert('Error fetching patient documents');
+    }
+  };
+
+  const viewPatientDoc = (docId) => {
+    const viewUrl = `http://localhost:3001/api/auth/view-patient-document/${docId}`;
+    window.open(viewUrl, '_blank');
+  };
+
+  const downloadPatientDoc = async (docId, fileName) => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/auth/download-patient-document/${docId}`);
+      
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      } else {
+        alert('Error downloading file');
+      }
+    } catch (error) {
+      alert('Error downloading file: ' + error.message);
+    }
+  };
+
+  const fetchPaymentHistory = async () => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/auth/admin-salary-history/${adminData?.fullName || 'Admin'}`);
+      const result = await response.json();
+      if (result.success) {
+        setPaymentHistory(result.salaries);
+      }
+    } catch (error) {
+      console.error('Error fetching payment history:', error);
+    }
+  };
+
+  const handlePaymentHistoryClick = () => {
+    fetchPaymentHistory();
+    setShowPaymentHistory(true);
   };
 
   if (showUploadMedical) {
@@ -212,6 +308,84 @@ const AdminDashboard = ({ onLogout, adminData }) => {
 
   if (showSystemSettings) {
     return <SystemSettings onBack={() => setShowSystemSettings(false)} />;
+  }
+
+  if (showPaymentHistory) {
+    const totalAmount = paymentHistory.reduce((sum, payment) => sum + parseFloat(payment.amount), 0);
+    
+    return (
+      <div className="payment-history-container">
+        <div className="container-fluid h-100">
+          <div className="row justify-content-center align-items-center min-vh-100">
+            <div className="col-md-10 col-lg-8">
+              <div className="payment-history-card">
+                <div className="payment-history-header">
+                  <button
+                    className="payment-back-btn"
+                    onClick={() => setShowPaymentHistory(false)}
+                  >
+                    <i className="fas fa-arrow-left me-2"></i>
+                    Back to Dashboard
+                  </button>
+                  <h2><i className="fas fa-history me-2"></i>Payment History</h2>
+                  <p>Your complete salary payment records</p>
+                </div>
+
+                <div className="payment-history-content">
+                  {paymentHistory.length > 0 && (
+                    <div className="payment-stats">
+                      <div className="payment-total">${totalAmount.toFixed(2)}</div>
+                      <div className="payment-count">Total from {paymentHistory.length} payment{paymentHistory.length !== 1 ? 's' : ''}</div>
+                    </div>
+                  )}
+
+                  {paymentHistory.length === 0 ? (
+                    <div className="payment-empty-state">
+                      <i className="fas fa-dollar-sign"></i>
+                      <h5>No Payment History</h5>
+                      <p>No salary payments have been received yet.</p>
+                    </div>
+                  ) : (
+                    <div className="payment-history-list">
+                      {paymentHistory.map((payment) => (
+                        <div key={payment.id} className="payment-card mb-3 p-4">
+                          <div className="row align-items-center">
+                            <div className="col-md-2 text-center">
+                              <div className="payment-icon">
+                                <i className="fas fa-check-circle fa-lg"></i>
+                              </div>
+                            </div>
+                            <div className="col-md-10">
+                              <div className="payment-amount">${parseFloat(payment.amount).toFixed(2)}</div>
+                              <div className="payment-detail">
+                                <i className="fas fa-calendar"></i>
+                                <strong>Period:</strong> {new Date(0, payment.month - 1).toLocaleString('default', { month: 'long' })} {payment.year}
+                              </div>
+                              <div className="payment-detail">
+                                <i className="fas fa-clock"></i>
+                                <strong>Received:</strong> {new Date(payment.createdAt).toLocaleDateString()} at {new Date(payment.createdAt).toLocaleTimeString()}
+                              </div>
+                              <div className="payment-detail">
+                                <i className="fas fa-calendar-day"></i>
+                                <strong>Day:</strong> {new Date(payment.createdAt).toLocaleDateString('en-US', { weekday: 'long' })}
+                              </div>
+                              <div className="payment-detail">
+                                <i className="fas fa-user"></i>
+                                <strong>Credited By:</strong> {payment.submittedBy}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (showAdminLeave) {
@@ -470,6 +644,12 @@ const AdminDashboard = ({ onLogout, adminData }) => {
                     Request Leave
                   </a>
                 </li>
+                <li className="nav-item mb-2">
+                  <a className="nav-link" href="#" onClick={handlePaymentHistoryClick}>
+                    <i className="fas fa-history me-2"></i>
+                    Payment History
+                  </a>
+                </li>
               </ul>
             </div>
           </div>
@@ -578,6 +758,7 @@ const AdminDashboard = ({ onLogout, adminData }) => {
                             <th>Doctor</th>
                             <th>Reason</th>
                             <th>Status</th>
+                            <th>Documents</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -616,6 +797,14 @@ const AdminDashboard = ({ onLogout, adminData }) => {
                                   }`}>
                                   {appointment.status.toUpperCase()}
                                 </span>
+                              </td>
+                              <td>
+                                <button
+                                  className="btn btn-info btn-sm"
+                                  onClick={() => viewPatientDocs(appointment.patientId, appointment.patient?.fullName)}
+                                >
+                                  <i className="fas fa-eye me-1"></i>View Docs
+                                </button>
                               </td>
                             </tr>
                           ))}
@@ -664,6 +853,98 @@ const AdminDashboard = ({ onLogout, adminData }) => {
                 <button type="button" className="btn btn-primary" onClick={closeLeavePopup}>
                   OK
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Salary Status Popup */}
+      {salaryStatusPopup && (
+        <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header bg-success text-white">
+                <h5 className="modal-title">
+                  <i className="fas fa-dollar-sign me-2"></i>
+                  Salary Credited Successfully!
+                </h5>
+                <button type="button" className="btn-close btn-close-white" onClick={closeSalaryPopup}></button>
+              </div>
+              <div className="modal-body">
+                <div className="text-center mb-3">
+                  <i className="fas fa-check-circle text-success fa-3x mb-3"></i>
+                  <h4 className="text-success">Payment Received</h4>
+                </div>
+                <div className="salary-details">
+                  <p><strong>Amount:</strong> <span className="text-success">${parseFloat(salaryStatusPopup.amount).toFixed(2)}</span></p>
+                  <p><strong>Month:</strong> {new Date(0, salaryStatusPopup.month - 1).toLocaleString('default', { month: 'long' })} {salaryStatusPopup.year}</p>
+                  <p><strong>Credited Date:</strong> {new Date(salaryStatusPopup.createdAt).toLocaleDateString()}</p>
+                  <p><strong>Credited Time:</strong> {new Date(salaryStatusPopup.createdAt).toLocaleTimeString()}</p>
+                  <p><strong>Day:</strong> {new Date(salaryStatusPopup.createdAt).toLocaleDateString('en-US', { weekday: 'long' })}</p>
+                  <p><strong>Submitted By:</strong> {salaryStatusPopup.submittedBy}</p>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-success" onClick={closeSalaryPopup}>
+                  <i className="fas fa-thumbs-up me-2"></i>
+                  Great!
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Patient Documents Popup */}
+      {showPatientDocs && (
+        <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.8)' }}>
+          <div className="modal-dialog modal-xl modal-dialog-centered">
+            <div className="modal-content" style={{ height: '90vh' }}>
+              <div className="modal-header">
+                <h5 className="modal-title">
+                  <i className="fas fa-folder-open me-2"></i>
+                  {selectedPatientName}'s Documents ({patientDocs.length})
+                </h5>
+                <button type="button" className="btn-close" onClick={() => setShowPatientDocs(false)}></button>
+              </div>
+              <div className="modal-body" style={{ height: 'calc(90vh - 120px)', overflowY: 'auto' }}>
+                {patientDocs.length === 0 ? (
+                  <div className="text-center py-5">
+                    <i className="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                    <h5>No Documents Found</h5>
+                    <p className="text-muted">This patient hasn't uploaded any documents yet.</p>
+                  </div>
+                ) : (
+                  <div className="documents-list">
+                    {patientDocs.map((doc) => (
+                      <div key={doc.id} className="document-card mb-3 p-3 border rounded">
+                        <div className="row align-items-center">
+                          <div className="col-md-1">
+                            <i className="fas fa-file-pdf fa-2x text-danger"></i>
+                          </div>
+                          <div className="col-md-9">
+                            <h6 className="mb-1">{doc.title}</h6>
+                            <p className="text-muted mb-1 small">{doc.description || 'No description provided'}</p>
+                            <div className="d-flex gap-3 small text-muted">
+                              <span><i className="fas fa-calendar me-1"></i>{new Date(doc.createdAt).toLocaleDateString()}</span>
+                              <span><i className="fas fa-file me-1"></i>{doc.fileName}</span>
+                              <span><i className="fas fa-weight me-1"></i>{(doc.fileSize / 1024).toFixed(1)} KB</span>
+                            </div>
+                          </div>
+                          <div className="col-md-2 text-end">
+                            <button 
+                              className="btn btn-primary btn-sm"
+                              onClick={() => viewPatientDoc(doc.id)}
+                            >
+                              <i className="fas fa-eye me-1"></i>View PDF
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>

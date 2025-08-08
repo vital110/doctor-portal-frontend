@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const { Admin, Patient, Appointment, ClinicSetting, Holiday, DoctorLeave, MedicalRecord, AdminLeave } = require('../models');
+const { Admin, Patient, Appointment, ClinicSetting, Holiday, DoctorLeave, MedicalRecord, AdminLeave, AdminSalary, PatientMedicalDoc } = require('../models');
 const { Op } = require('sequelize');
 const { adminRegistrationSchema, patientRegistrationSchema, loginSchema, appointmentSchema } = require('../validators/authValidators');
 const router = express.Router();
@@ -895,6 +895,41 @@ router.get('/patient-medical-records/:patientId', async (req, res) => {
   }
 });
 
+// View medical record
+router.get('/view-medical-record/:recordId', async (req, res) => {
+  try {
+    const { recordId } = req.params;
+
+    const record = await MedicalRecord.findByPk(recordId);
+
+    if (!record) {
+      return res.status(404).json({
+        success: false,
+        message: 'Medical record not found'
+      });
+    }
+
+    if (!fs.existsSync(record.filePath)) {
+      return res.status(404).json({
+        success: false,
+        message: 'File not found on server'
+      });
+    }
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'inline');
+
+    const fileStream = fs.createReadStream(record.filePath);
+    fileStream.pipe(res);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error viewing medical record',
+      error: error.message
+    });
+  }
+});
+
 // Download medical record
 router.get('/download-medical-record/:recordId', async (req, res) => {
   try {
@@ -1063,6 +1098,289 @@ router.get('/admin-leaves-status/:adminName', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error fetching leave status',
+      error: error.message
+    });
+  }
+});
+
+// Submit admin salary
+router.post('/admin-salaries', async (req, res) => {
+  try {
+    const { adminName, amount, month, year, submittedBy } = req.body;
+
+    // Check if salary already exists for this admin and month/year
+    const existingSalary = await AdminSalary.findOne({
+      where: {
+        adminName: adminName,
+        month: month,
+        year: year,
+        isActive: true
+      }
+    });
+
+    if (existingSalary) {
+      return res.status(400).json({
+        success: false,
+        message: `Salary for ${adminName} already submitted for ${new Date(0, month - 1).toLocaleString('default', { month: 'long' })} ${year}`
+      });
+    }
+
+    const salary = await AdminSalary.create({
+      adminName,
+      amount,
+      month,
+      year,
+      submittedBy,
+      isActive: true
+    });
+
+    res.json({
+      success: true,
+      message: 'Admin salary submitted successfully',
+      salary: salary
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error submitting admin salary',
+      error: error.message
+    });
+  }
+});
+
+// Get admin salary status
+router.get('/admin-salary-status/:adminName', async (req, res) => {
+  try {
+    const { adminName } = req.params;
+
+    const salary = await AdminSalary.findOne({
+      where: {
+        adminName: adminName,
+        isActive: true
+      },
+      order: [['createdAt', 'DESC']]
+    });
+
+    res.json({
+      success: true,
+      salary: salary
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching salary status',
+      error: error.message
+    });
+  }
+});
+
+// Get all admin salaries for manager
+router.get('/all-admin-salaries', async (req, res) => {
+  try {
+    const salaries = await AdminSalary.findAll({
+      where: { isActive: true },
+      order: [['createdAt', 'DESC']]
+    });
+
+    res.json({
+      success: true,
+      salaries: salaries
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching admin salaries',
+      error: error.message
+    });
+  }
+});
+
+// Get admin salary history
+router.get('/admin-salary-history/:adminName', async (req, res) => {
+  try {
+    const { adminName } = req.params;
+
+    const salaries = await AdminSalary.findAll({
+      where: {
+        adminName: adminName,
+        isActive: true
+      },
+      order: [['createdAt', 'DESC']]
+    });
+
+    res.json({
+      success: true,
+      salaries: salaries
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching salary history',
+      error: error.message
+    });
+  }
+});
+
+// Upload patient medical document
+router.post('/upload-patient-document', upload.single('documentFile'), async (req, res) => {
+  try {
+    const { patientId, title, description } = req.body;
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please select a PDF file to upload'
+      });
+    }
+
+    if (!patientId || !title) {
+      return res.status(400).json({
+        success: false,
+        message: 'Patient ID and title are required'
+      });
+    }
+
+    const document = await PatientMedicalDoc.create({
+      patientId: parseInt(patientId),
+      title,
+      description: description || '',
+      fileName: req.file.originalname,
+      filePath: req.file.path,
+      fileSize: req.file.size
+    });
+
+    res.json({
+      success: true,
+      message: 'Document uploaded successfully',
+      document: {
+        id: document.id,
+        title: document.title,
+        fileName: document.fileName,
+        uploadedAt: document.createdAt
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error uploading document',
+      error: error.message
+    });
+  }
+});
+
+// Get patient uploaded documents
+router.get('/patient-documents/:patientId', async (req, res) => {
+  try {
+    const { patientId } = req.params;
+
+    const documents = await PatientMedicalDoc.findAll({
+      where: { 
+        patientId,
+        isActive: true 
+      },
+      order: [['createdAt', 'DESC']]
+    });
+
+    res.json({
+      success: true,
+      documents: documents
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching documents',
+      error: error.message
+    });
+  }
+});
+
+// View patient document
+router.get('/view-patient-document/:documentId', async (req, res) => {
+  try {
+    const { documentId } = req.params;
+
+    const document = await PatientMedicalDoc.findByPk(documentId);
+
+    if (!document) {
+      return res.status(404).json({
+        success: false,
+        message: 'Document not found'
+      });
+    }
+
+    if (!fs.existsSync(document.filePath)) {
+      return res.status(404).json({
+        success: false,
+        message: 'File not found on server'
+      });
+    }
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'inline');
+
+    const fileStream = fs.createReadStream(document.filePath);
+    fileStream.pipe(res);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error viewing document',
+      error: error.message
+    });
+  }
+});
+
+// Download patient document
+router.get('/download-patient-document/:documentId', async (req, res) => {
+  try {
+    const { documentId } = req.params;
+
+    const document = await PatientMedicalDoc.findByPk(documentId);
+
+    if (!document) {
+      return res.status(404).json({
+        success: false,
+        message: 'Document not found'
+      });
+    }
+
+    if (!fs.existsSync(document.filePath)) {
+      return res.status(404).json({
+        success: false,
+        message: 'File not found on server'
+      });
+    }
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${document.fileName}"`);
+
+    const fileStream = fs.createReadStream(document.filePath);
+    fileStream.pipe(res);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error downloading document',
+      error: error.message
+    });
+  }
+});
+
+// Delete patient document
+router.delete('/patient-document/:documentId', async (req, res) => {
+  try {
+    const { documentId } = req.params;
+
+    await PatientMedicalDoc.destroy({
+      where: { id: documentId }
+    });
+
+    res.json({
+      success: true,
+      message: 'Document deleted successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting document',
       error: error.message
     });
   }

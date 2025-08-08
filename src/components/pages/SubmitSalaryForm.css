@@ -1,0 +1,206 @@
+/* Submit Salary Form Styles */
+.salary-form-container {
+  background: #f8f9fa;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.salary-form-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.salary-form-header {
+  background: #28a745;
+  color: white;
+  padding: 20px 30px;
+  border-radius: 8px 8px 0 0;
+  position: relative;
+}
+
+.salary-form-header h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.salary-form-header p {
+  font-size: 0.9rem;
+  margin: 5px 0 0 0;
+  opacity: 0.9;
+}
+
+.salary-back-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  transition: all 0.2s;
+}
+
+.salary-back-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.salary-form-content {
+  padding: 25px;
+}
+
+.salary-form-group {
+  margin-bottom: 20px;
+}
+
+.salary-form-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.salary-form-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.salary-form-input:focus {
+  outline: none;
+  border-color: #28a745;
+  box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.1);
+}
+
+.salary-form-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background: white;
+  transition: all 0.2s;
+}
+
+.salary-form-select:focus {
+  outline: none;
+  border-color: #28a745;
+  box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.1);
+}
+
+.salary-month-buttons {
+  margin-bottom: 12px;
+}
+
+.salary-month-btn-group {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.salary-month-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  background: white;
+  color: #495057;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.salary-month-btn:hover {
+  background: #f8f9fa;
+  border-color: #28a745;
+}
+
+.salary-month-btn.previous {
+  border-color: #007bff;
+  color: #007bff;
+}
+
+.salary-month-btn.current {
+  border-color: #28a745;
+  color: #28a745;
+}
+
+.salary-month-btn.advance {
+  border-color: #ffc107;
+  color: #ffc107;
+}
+
+.salary-amount-group {
+  position: relative;
+}
+
+.salary-amount-prefix {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #28a745;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.salary-amount-input {
+  padding-left: 30px;
+}
+
+.salary-submit-btn {
+  width: 100%;
+  padding: 12px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.salary-submit-btn:hover {
+  background: #218838;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+@media (max-width: 768px) {
+  .salary-form-container {
+    padding: 10px;
+  }
+  
+  .salary-form-header {
+    padding: 15px 20px;
+  }
+  
+  .salary-form-content {
+    padding: 15px;
+  }
+  
+  .salary-back-btn {
+    position: static;
+    margin-bottom: 10px;
+    display: block;
+    width: fit-content;
+  }
+  
+  .salary-month-btn-group {
+    flex-direction: column;
+    gap: 6px;
+  }
+}
