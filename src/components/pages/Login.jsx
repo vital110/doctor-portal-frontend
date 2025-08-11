@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import ManagerDashboard from './ManagerDashboard';
 import AdminDashboard from './AdminDashboard';
 import PatientDashboard from './PatientDashboard';
@@ -7,34 +8,12 @@ import './Login.css';
 
 const Login = () => {
     const navigate = useNavigate();
+    const { user, login, loading } = useAuth();
     const [formData, setFormData] = useState({
         email: '',
         password: ''
     });
-    const [isManager, setIsManager] = useState(false);
-    const [isAdmin, setIsAdmin] = useState(false);
-    const [isPatient, setIsPatient] = useState(false);
-    const [adminData, setAdminData] = useState(null);
-    const [patientData, setPatientData] = useState(null);
 
-    // Check for existing authentication on component mount
-    useEffect(() => {
-        const authData = localStorage.getItem('authData');
-        if (authData) {
-            const { userType, userData } = JSON.parse(authData);
-            if (userType === 'manager') {
-                setIsManager(true);
-            } else if (userType === 'admin') {
-                setIsAdmin(true);
-                setAdminData(userData);
-            } else if (userType === 'patient') {
-                setIsPatient(true);
-                setPatientData(userData);
-            }
-        }
-    }, []);
-
-    // Default manager credentials
     const MANAGER_CREDENTIALS = {
         email: 'manager@healthcare.com',
         password: 'manager123'
@@ -50,105 +29,74 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Check if credentials match manager
         if (formData.email === MANAGER_CREDENTIALS.email &&
             formData.password === MANAGER_CREDENTIALS.password) {
-            setIsManager(true);
-            localStorage.setItem('authData', JSON.stringify({ userType: 'manager' }));
+            login({ userType: 'manager', email: formData.email });
             return;
         }
 
-        // Check admin credentials from database
         try {
             const adminResponse = await fetch('http://localhost:3001/api/auth/login-admin', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
             });
 
             const adminResult = await adminResponse.json();
 
             if (adminResponse.ok && adminResult.success) {
-                setIsAdmin(true);
-                setAdminData(adminResult.admin);
-                localStorage.setItem('authData', JSON.stringify({
-                    userType: 'admin',
-                    userData: adminResult.admin
-                }));
+                login({ userType: 'admin', userData: adminResult.admin });
                 return;
             }
-        } catch (error) {
-            console.error('Admin login error:', error);
-        }
 
-        // Check patient credentials from database
-        try {
             const patientResponse = await fetch('http://localhost:3001/api/auth/login-patient', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
             });
 
             const patientResult = await patientResponse.json();
 
             if (patientResponse.ok && patientResult.success) {
-                setIsPatient(true);
-                setPatientData(patientResult.patient);
-                localStorage.setItem('authData', JSON.stringify({
-                    userType: 'patient',
-                    userData: patientResult.patient
-                }));
+                login({ userType: 'patient', userData: patientResult.patient });
                 return;
             }
+
+            alert('Invalid credentials');
         } catch (error) {
-            console.error('Patient login error:', error);
+            console.error('Login error:', error);
+            alert('Login failed');
         }
-
-        alert('Invalid credentials');
-    };
-
-    const handleLogout = () => {
-        setIsManager(false);
-        setIsAdmin(false);
-        setIsPatient(false);
-        setAdminData(null);
-        setPatientData(null);
-        setFormData({ email: '', password: '' });
-        localStorage.removeItem('authData');
     };
 
     const handleBackToHome = (e) => {
         e.preventDefault();
         navigate('/');
         setFormData({ email: '', password: '' });
+    };
 
-    }
     const handleGoToSignup = () => navigate('/signup');
 
-    // Show manager dashboard if authenticated
-    if (isManager) {
-        return <ManagerDashboard onLogout={handleLogout} />;
+    if (loading) {
+        return <div>Loading...</div>;
     }
 
-    // Show admin dashboard if authenticated
-    if (isAdmin) {
-        return <AdminDashboard onLogout={handleLogout} adminData={adminData} />;
+    if (user?.userType === 'manager') {
+        return <ManagerDashboard />;
     }
 
-    // Show patient dashboard if authenticated
-    if (isPatient) {
-        return <PatientDashboard onLogout={handleLogout} patientData={patientData} />;
+    if (user?.userType === 'admin') {
+        return <AdminDashboard adminData={user.userData} />;
+    }
+
+    if (user?.userType === 'patient') {
+        return <PatientDashboard patientData={user.userData} />;
     }
 
     return (
         <div className="login-container">
             <div className="container-fluid h-100">
                 <div className="row h-100">
-                    {/* Left Side - Form */}
                     <div className="col-lg-6 d-flex align-items-center justify-content-center">
                         <div className="login-card">
                             <div className="login-header">
@@ -158,7 +106,6 @@ const Login = () => {
                                     onClick={handleBackToHome}
                                 >
                                     <i className="fas fa-arrow-left me-2"></i>
-
                                 </button>
                                 <h2 className="login-title">Welcome Back</h2>
                                 <p className="login-subtitle">Sign in to access your healthcare dashboard</p>
@@ -228,7 +175,6 @@ const Login = () => {
                         </div>
                     </div>
 
-                    {/* Right Side - Image/Info */}
                     <div className="col-lg-6 d-none d-lg-flex">
                         <div className="login-info-side">
                             <div className="info-icon">
@@ -238,31 +184,11 @@ const Login = () => {
                             <p className="info-description">
                                 Manage appointments, view medical records, and connect with healthcare professionals
                             </p>
-                            {/* <div className="info-features"> */}
-                            {/* <div className="feature-item">
-                                <div className="feature-icon">
-                                    <i className="fas fa-calendar-check"></i>
-                                </div> */}
-                            {/* <p className="feature-text">Book Appointments</p> */}
-                            {/* </div>
-                        <div className="feature-item">
-                            <div className="feature-icon"> */}
-                            {/* <i className="fas fa-file-medical"></i>
-                        </div>
-                        <p className="feature-text">Medical Records</p>
-                    </div> */}
-                            {/* <div className="feature-item">
-                                <div className="feature-icon">
-                                    <i className="fas fa-comments"></i>
-                                </div> */}
-                            {/* <p className="feature-text">Chat with Doctors</p> */}
                         </div>
                     </div>
                 </div>
             </div>
-        </div >
-        // </div >
-        // </div >
+        </div>
     );
 };
 

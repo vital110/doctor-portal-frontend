@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import './ManagerDashboard.css';
 import './AdminForm.css';
 import './SubmitSalaryForm.css';
 import './SalaryList.css';
 
 const ManagerDashboard = ({ onLogout }) => {
+  const { logout, extendSession } = useAuth();
   const [showAdminForm, setShowAdminForm] = useState(false);
   const [showAdminList, setShowAdminList] = useState(false);
   const [showAppointmentFilter, setShowAppointmentFilter] = useState(false);
@@ -24,10 +26,7 @@ const ManagerDashboard = ({ onLogout }) => {
   });
   const [showAdminLeaves, setShowAdminLeaves] = useState(false);
   const [adminLeaves, setAdminLeaves] = useState([]);
-  const [disabledButtons, setDisabledButtons] = useState(() => {
-    const saved = localStorage.getItem('disabledLeaveButtons');
-    return saved ? new Set(JSON.parse(saved)) : new Set();
-  });
+
   const [showSalaryForm, setShowSalaryForm] = useState(false);
   const [salaryFormData, setSalaryFormData] = useState({
     adminName: '',
@@ -48,6 +47,29 @@ const ManagerDashboard = ({ onLogout }) => {
     fetchAdminCount();
   }, []);
 
+  useEffect(() => {
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+    
+    events.forEach(event => {
+      document.addEventListener(event, handleActivity, true);
+    });
+
+    return () => {
+      events.forEach(event => {
+        document.removeEventListener(event, handleActivity, true);
+      });
+    };
+  }, []);
+
+  const handleActivity = () => {
+    extendSession();
+  };
+
+  const handleLogout = () => {
+    logout();
+    if (onLogout) onLogout();
+  };
+
   const fetchAdminLeaves = async () => {
     try {
       const response = await fetch('http://localhost:3001/api/auth/admin-leaves');
@@ -66,10 +88,6 @@ const ManagerDashboard = ({ onLogout }) => {
   };
 
   const handleLeaveAction = async (leaveId, action) => {
-    const newDisabledSet = new Set(disabledButtons).add(leaveId);
-    setDisabledButtons(newDisabledSet);
-    localStorage.setItem('disabledLeaveButtons', JSON.stringify([...newDisabledSet]));
-
     try {
       const response = await fetch(`http://localhost:3001/api/auth/admin-leaves/${leaveId}`, {
         method: 'PUT',
@@ -92,17 +110,9 @@ const ManagerDashboard = ({ onLogout }) => {
         );
       } else {
         alert(result.message || `Failed to ${action} leave request`);
-        const revertedSet = new Set(disabledButtons);
-        revertedSet.delete(leaveId);
-        setDisabledButtons(revertedSet);
-        localStorage.setItem('disabledLeaveButtons', JSON.stringify([...revertedSet]));
       }
     } catch (error) {
       alert(`Error ${action}ing leave request: ` + error.message);
-      const revertedSet = new Set(disabledButtons);
-      revertedSet.delete(leaveId);
-      setDisabledButtons(revertedSet);
-      localStorage.setItem('disabledLeaveButtons', JSON.stringify([...revertedSet]));
     }
   };
 
@@ -273,25 +283,25 @@ const ManagerDashboard = ({ onLogout }) => {
 
   const applySalaryFilter = () => {
     let filtered = salaryList;
-    
+
     if (salaryFilter.adminName) {
-      filtered = filtered.filter(salary => 
+      filtered = filtered.filter(salary =>
         salary.adminName.toLowerCase().includes(salaryFilter.adminName.toLowerCase())
       );
     }
-    
+
     if (salaryFilter.month) {
-      filtered = filtered.filter(salary => 
+      filtered = filtered.filter(salary =>
         salary.month.toString() === salaryFilter.month
       );
     }
-    
+
     if (salaryFilter.year) {
-      filtered = filtered.filter(salary => 
+      filtered = filtered.filter(salary =>
         salary.year.toString() === salaryFilter.year
       );
     }
-    
+
     setFilteredSalaryList(filtered);
   };
 
@@ -457,7 +467,7 @@ const ManagerDashboard = ({ onLogout }) => {
                               <button
                                 className="btn btn-success btn-sm mb-2"
                                 onClick={() => handleLeaveAction(leave.id, 'approved')}
-                                disabled={disabledButtons.has(leave.id)}
+                                disabled={leave.status === 'approved' || leave.status === 'rejected'}
                               >
                                 <i className="fas fa-check me-1"></i>
                                 Approve
@@ -465,7 +475,7 @@ const ManagerDashboard = ({ onLogout }) => {
                               <button
                                 className="btn btn-danger btn-sm"
                                 onClick={() => handleLeaveAction(leave.id, 'rejected')}
-                                disabled={disabledButtons.has(leave.id)}
+                                disabled={leave.status === 'approved' || leave.status === 'rejected'}
                               >
                                 <i className="fas fa-times me-1"></i>
                                 Reject
@@ -542,7 +552,7 @@ const ManagerDashboard = ({ onLogout }) => {
   if (showSalaryList) {
     const displayList = filteredSalaryList;
     const totalAmount = displayList.reduce((sum, salary) => sum + parseFloat(salary.amount), 0);
-    
+
     return (
       <div className="salary-list-container">
         <div className="container-fluid h-100">
@@ -746,7 +756,7 @@ const ManagerDashboard = ({ onLogout }) => {
                             onClick={() => {
                               const prevMonth = new Date().getMonth() === 0 ? 12 : new Date().getMonth();
                               const prevYear = new Date().getMonth() === 0 ? new Date().getFullYear() - 1 : new Date().getFullYear();
-                              setSalaryFormData({...salaryFormData, month: prevMonth.toString(), year: prevYear});
+                              setSalaryFormData({ ...salaryFormData, month: prevMonth.toString(), year: prevYear });
                             }}
                           >
                             Previous Month
@@ -755,7 +765,7 @@ const ManagerDashboard = ({ onLogout }) => {
                             type="button"
                             className="salary-month-btn current"
                             onClick={() => {
-                              setSalaryFormData({...salaryFormData, month: (new Date().getMonth() + 1).toString(), year: new Date().getFullYear()});
+                              setSalaryFormData({ ...salaryFormData, month: (new Date().getMonth() + 1).toString(), year: new Date().getFullYear() });
                             }}
                           >
                             Current Month
@@ -766,7 +776,7 @@ const ManagerDashboard = ({ onLogout }) => {
                             onClick={() => {
                               const nextMonth = new Date().getMonth() === 11 ? 1 : new Date().getMonth() + 2;
                               const nextYear = new Date().getMonth() === 11 ? new Date().getFullYear() + 1 : new Date().getFullYear();
-                              setSalaryFormData({...salaryFormData, month: nextMonth.toString(), year: nextYear});
+                              setSalaryFormData({ ...salaryFormData, month: nextMonth.toString(), year: nextYear });
                             }}
                           >
                             Advance Month
@@ -947,7 +957,7 @@ const ManagerDashboard = ({ onLogout }) => {
             Manager Dashboard
           </span>
           <div className="logout-container">
-            <button className="logout-btn" onClick={onLogout}>
+            <button className="logout-btn" onClick={handleLogout}>
               <i className="fas fa-power-off"></i>
               <span>Logout</span>
             </button>

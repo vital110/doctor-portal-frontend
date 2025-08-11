@@ -24,7 +24,7 @@ const Home = () => {
                             className="btn btn-primary"
                             onClick={() => navigate('/signup')}
                         >
-                            Sign Up
+                            Register Patient
                         </button>
                     </div>
                 </div>

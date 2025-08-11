@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import MedicalRecords from './MedicalRecords';
 
 const PatientDashboard = ({ onLogout, patientData }) => {
+  const { logout } = useAuth();
   const [showAppointmentForm, setShowAppointmentForm] = useState(false);
   const [showAppointments, setShowAppointments] = useState(false);
   const [showMedicalRecords, setShowMedicalRecords] = useState(false);
@@ -23,6 +25,11 @@ const PatientDashboard = ({ onLogout, patientData }) => {
       checkHoliday();
     }
   }, [showAppointmentForm]);
+
+  const handleLogout = () => {
+    logout();
+    if (onLogout) onLogout();
+  };
 
   const checkHoliday = async () => {
     try {
@@ -499,7 +506,7 @@ const PatientDashboard = ({ onLogout, patientData }) => {
             Patient Portal - {patientData?.fullName}
           </span>
           <div className="logout-container">
-            <button className="logout-btn" onClick={onLogout}>
+            <button className="logout-btn" onClick={handleLogout}>
               <i className="fas fa-power-off"></i>
               <span>Logout</span>
             </button>

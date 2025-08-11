@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import SystemSettings from './SystemSettings';
 import UploadMedicalRecord from './UploadMedicalRecord';
 import './AdminDashboard.css';
@@ -6,6 +7,7 @@ import './PreviousAppointments.css';
 import './PaymentHistory.css';
 
 const AdminDashboard = ({ onLogout, adminData }) => {
+  const { logout } = useAuth();
   const timeoutRef = useRef(null);
   const TIMEOUT_DURATION = 10 * 60 * 1000; // 10 minutes
   const [appointments, setAppointments] = useState([]);
@@ -40,7 +42,7 @@ const AdminDashboard = ({ onLogout, adminData }) => {
     }
     timeoutRef.current = setTimeout(() => {
       alert('Session expired due to inactivity. You will be logged out.');
-      onLogout();
+      handleLogout();
     }, TIMEOUT_DURATION);
   };
 
@@ -75,6 +77,11 @@ const AdminDashboard = ({ onLogout, adminData }) => {
       });
     };
   }, []);
+
+  const handleLogout = () => {
+    logout();
+    if (onLogout) onLogout();
+  };
 
   const fetchTodayAppointments = async () => {
     try {
@@ -222,7 +229,6 @@ const AdminDashboard = ({ onLogout, adminData }) => {
         
         if (!lastChecked) {
           setSalaryStatusPopup(result.salary);
-          localStorage.setItem(`lastSalaryCheck_${result.salary.id}`, 'seen');
         }
       }
     } catch (error) {
@@ -235,7 +241,12 @@ const AdminDashboard = ({ onLogout, adminData }) => {
   };
 
   const closeSalaryPopup = () => {
+    if (salaryStatusPopup) {
+      localStorage.setItem(`lastSalaryCheck_${salaryStatusPopup.id}`, 'seen');
+    }
     setSalaryStatusPopup(null);
+    // Refresh payment history data
+    fetchPaymentHistory();
   };
 
   const viewPatientDocs = async (patientId, patientName) => {
@@ -588,7 +599,7 @@ const AdminDashboard = ({ onLogout, adminData }) => {
             Admin Panel - {adminData?.role || 'Admin'}
           </span>
           <div className="logout-container">
-            <button className="logout-btn" onClick={onLogout}>
+            <button className="logout-btn" onClick={handleLogout}>
               <i className="fas fa-power-off"></i>
               <span>Logout</span>
             </button>
