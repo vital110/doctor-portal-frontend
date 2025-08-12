@@ -57,7 +57,7 @@ const Signup = () => {
         try {
             // Decode JWT token to get user info
             const payload = JSON.parse(atob(response.credential.split('.')[1]));
-            
+
             const googleSignupData = {
                 email: payload.email,
                 name: payload.name,
@@ -197,13 +197,13 @@ const Signup = () => {
                                     <i className="fas fa-user-plus me-2"></i>
                                     Create Account
                                 </button>
-                                
+
                                 <div className="text-center my-3">
                                     <span className="text-muted">or</span>
                                 </div>
-                                
-                                <button 
-                                    type="button" 
+
+                                <button
+                                    type="button"
                                     className="btn btn-outline-danger w-100 py-3"
                                     onClick={handleGoogleSignup}
                                 >
