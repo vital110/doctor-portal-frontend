@@ -28,6 +28,8 @@ const PatientDashboard = ({ onLogout, patientData }) => {
   const [showPaymentHistory, setShowPaymentHistory] = useState(false);
   const [showAppointmentPayment, setShowAppointmentPayment] = useState(false);
   const [pendingAppointment, setPendingAppointment] = useState(null);
+  const [dailyHealthTip, setDailyHealthTip] = useState('');
+  const [dailyMotivationQuote, setDailyMotivationQuote] = useState('');
 
   useEffect(() => {
     if (showAppointmentForm) {
@@ -35,9 +37,94 @@ const PatientDashboard = ({ onLogout, patientData }) => {
     }
   }, [showAppointmentForm]);
 
+  useEffect(() => {
+    setDailyHealthTip(getDailyHealthTip());
+    setDailyMotivationQuote(getDailyMotivationQuote());
+  }, []);
+
   const handleLogout = () => {
     logout();
     if (onLogout) onLogout();
+  };
+
+  const getDailyHealthTip = () => {
+    const healthTips = [
+      "💓 Heart Health: Take a 30-minute brisk walk daily to strengthen your heart and improve circulation.",
+      "🧠 Mental Health: Practice deep breathing for 10 minutes to reduce stress and calm your mind.",
+      "🫁 Lung Health: Avoid smoking and practice breathing exercises to keep your lungs healthy.",
+      "🩸 Blood Pressure: Limit sodium intake to less than 2,300mg daily to maintain healthy blood pressure.",
+      "💓 Heart Health: Include omega-3 rich foods like salmon, walnuts, and flaxseeds in your diet.",
+      "🧠 Mental Health: Get 7-9 hours of quality sleep to support brain function and emotional well-being.",
+      "🫁 Lung Health: Stay hydrated with 8 glasses of water daily to keep lung tissues moist.",
+      "🩸 Blood Pressure: Practice meditation or yoga to naturally lower blood pressure levels.",
+      "💓 Heart Health: Limit saturated fats and choose lean proteins for better heart health.",
+      "🧠 Mental Health: Stay socially connected with friends and family to boost mental wellness.",
+      "🫁 Lung Health: Exercise regularly to improve lung capacity and oxygen circulation.",
+      "🩸 Blood Pressure: Maintain a healthy weight to reduce strain on your cardiovascular system.",
+      "💓 Heart Health: Eat fiber-rich foods like oats, beans, and fruits to lower cholesterol.",
+      "🧠 Mental Health: Practice mindfulness and gratitude to improve mental clarity and mood.",
+      "🫁 Lung Health: Keep your home well-ventilated and use air purifiers to reduce pollutants.",
+      "🩸 Blood Pressure: Limit alcohol consumption to maintain healthy blood pressure readings.",
+      "💓 Heart Health: Take the stairs instead of elevators for extra cardiovascular exercise.",
+      "🧠 Mental Health: Engage in hobbies and activities you enjoy to reduce stress levels.",
+      "🫁 Lung Health: Practice diaphragmatic breathing to strengthen respiratory muscles.",
+      "🩸 Blood Pressure: Include potassium-rich foods like bananas and spinach in your diet.",
+      "💓 Heart Health: Monitor your heart rate during exercise to stay in the optimal zone.",
+      "🧠 Mental Health: Take regular breaks from work and screens to prevent mental fatigue.",
+      "🫁 Lung Health: Avoid exposure to secondhand smoke and air pollution when possible.",
+      "🩸 Blood Pressure: Check your blood pressure regularly and keep a log for your doctor.",
+      "💓 Heart Health: Replace refined grains with whole grains for better heart health.",
+      "🧠 Mental Health: Learn new skills or hobbies to keep your brain active and engaged.",
+      "🫁 Lung Health: Use a humidifier in dry environments to keep airways moist.",
+      "🩸 Blood Pressure: Practice progressive muscle relaxation to reduce stress and BP.",
+      "💓 Heart Health: Limit processed foods high in trans fats and preservatives.",
+      "🧠 Mental Health: Spend time in nature to reduce anxiety and improve mood.",
+      "🫁 Lung Health: Get vaccinated against flu and pneumonia to protect lung health."
+    ];
+    
+    const today = new Date();
+    const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+    return healthTips[dayOfYear % healthTips.length];
+  };
+
+  const getDailyMotivationQuote = () => {
+    const motivationQuotes = [
+      "✨ 'Your health is your wealth. Invest in it wisely every single day.'",
+      "💪 'Every step towards better health is a victory worth celebrating.'",
+      "🌟 'Healing is not just about medicine, it's about hope, faith, and positive thinking.'",
+      "🌈 'Your body is your temple. Keep it pure and clean for the soul to reside in.'",
+      "🦋 'Recovery is not a race. Your speed doesn't matter, forward is forward.'",
+      "🌱 'Health is not about the weight you lose, but about the life you gain.'",
+      "💎 'Take care of your body. It's the only place you have to live.'",
+      "🌸 'A healthy outside starts from the inside. Nourish your mind and body.'",
+      "⭐ 'You are stronger than you think and more resilient than you know.'",
+      "🌺 'Every day is a new opportunity to improve your health and happiness.'",
+      "🔥 'Your health journey is a marathon, not a sprint. Pace yourself with love.'",
+      "🌻 'Believe in your ability to heal, grow, and become the best version of yourself.'",
+      "💫 'Small daily improvements lead to stunning long-term results in health.'",
+      "🎯 'Focus on progress, not perfection. Every healthy choice matters.'",
+      "🌙 'Rest when you're weary. Refresh and renew yourself, your body, your mind.'",
+      "☀️ 'Today is a gift. Use it to make healthy choices that honor your body.'",
+      "🦋 'Transform your health one positive choice at a time. You've got this!'",
+      "🌿 'Listen to your body. It whispers before it screams.'",
+      "💝 'Self-care is not selfish. It's essential for your well-being.'",
+      "🌊 'Flow with the rhythm of healing. Trust the process of recovery.'",
+      "🎨 'Paint your life with healthy habits and vibrant wellness.'",
+      "🏔️ 'Mountains are climbed one step at a time. So is your health journey.'",
+      "🌟 'You have the power to heal yourself and create the life you deserve.'",
+      "🦅 'Soar above your challenges. Your strength is greater than any obstacle.'",
+      "🌈 'After every storm comes a rainbow. Your healing journey has beautiful moments ahead.'",
+      "💪 'Courage doesn't mean you don't get afraid. It means you don't let fear stop you from healing.'",
+      "🌸 'Bloom where you are planted. Find strength in your current health journey.'",
+      "⚡ 'You are not just surviving, you are thriving. Celebrate your resilience.'",
+      "🎪 'Life is a beautiful adventure. Take care of yourself so you can enjoy every moment.'",
+      "🌺 'Your wellness matters. You matter. Take time to nurture yourself today.'",
+      "🔮 'Believe in the magic of new beginnings. Every day is a chance to start fresh with your health.'"
+    ];
+    
+    const today = new Date();
+    const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+    return motivationQuotes[dayOfYear % motivationQuotes.length];
   };
 
   const checkHoliday = async () => {
@@ -727,6 +814,29 @@ const PatientDashboard = ({ onLogout, patientData }) => {
                         <i className="fas fa-history me-2"></i>
                         Payment History
                       </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="row mt-4">
+                <div className="col-md-6">
+                  <div className="card">
+                    <div className="card-header">
+                      <h5 className="mb-0"><i className="fas fa-lightbulb me-2"></i>Daily Health Tip</h5>
+                    </div>
+                    <div className="card-body">
+                      <p className="mb-0">{dailyHealthTip}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div className="card">
+                    <div className="card-header">
+                      <h5 className="mb-0"><i className="fas fa-quote-left me-2"></i>Daily Motivation</h5>
+                    </div>
+                    <div className="card-body">
+                      <p className="mb-0 fst-italic">{dailyMotivationQuote}</p>
                     </div>
                   </div>
                 </div>
