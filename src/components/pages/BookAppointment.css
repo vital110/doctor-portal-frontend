@@ -1,0 +1,208 @@
+.appointment-form-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.appointment-form-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  padding: 32px;
+  width: 100%;
+  max-width: 900px;
+  position: relative;
+  overflow: hidden;
+}
+
+.appointment-form-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: #6c757d;
+  font-size: 14px;
+  padding: 8px 0;
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.back-btn:hover {
+  color: #495057;
+}
+
+.appointment-form-card h2 {
+  color: #2d3748;
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.appointment-form-card p {
+  color: #718096;
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.holiday-alert {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.holiday-alert .alert-heading {
+  color: #856404;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.payment-option-selection {
+  margin-bottom: 20px;
+}
+
+.payment-option-selection label {
+  color: #2d3748;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.payment-option-card {
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.payment-option-card:hover {
+  border-color: #cbd5e0;
+  background: #f7fafc;
+}
+
+.payment-option-card.active {
+  border-color: #667eea;
+  background: #eef2ff;
+  color: #667eea;
+}
+
+.payment-option-card i {
+  font-size: 16px;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.payment-option-card small {
+  display: block;
+  font-size: 11px;
+  color: #718096;
+  margin-top: 4px;
+}
+
+.form-label {
+  color: #2d3748;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.input-group {
+  margin-bottom: 16px;
+}
+
+.input-group-text {
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-right: none;
+  color: #718096;
+  font-size: 14px;
+  padding: 10px 12px;
+}
+
+.form-control {
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  outline: none;
+}
+
+.input-group .form-control {
+  border-left: none;
+  border-radius: 0 6px 6px 0;
+}
+
+.form-control:disabled {
+  background: #f7fafc;
+  color: #a0aec0;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: transform 0.2s, box-shadow 0.2s;
+  width: 100%;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary:disabled {
+  background: #cbd5e0;
+  color: #a0aec0;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-primary i {
+  margin-right: 8px;
+}
+
+@media (max-width: 576px) {
+  .appointment-form-container {
+    padding: 16px;
+  }
+  
+  .appointment-form-card {
+    padding: 24px;
+  }
+  
+  .payment-option-card {
+    padding: 10px;
+    font-size: 12px;
+  }
+}

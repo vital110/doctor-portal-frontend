@@ -722,7 +722,10 @@ const AdminDashboard = ({ onLogout, adminData }) => {
                   </button>
                   <button
                     className="btn btn-info btn-sm"
-                    onClick={fetchTodayAppointments}
+                    onClick={() => {
+                      fetchTodayAppointments();
+                      console.log('Refreshing appointments and payment status...');
+                    }}
                   >
                     <i className="fas fa-sync me-1"></i>
                     Refresh
@@ -769,6 +772,7 @@ const AdminDashboard = ({ onLogout, adminData }) => {
                             <th>Doctor</th>
                             <th>Reason</th>
                             <th>Status</th>
+                            <th>Payment</th>
                             <th>Documents</th>
                           </tr>
                         </thead>
@@ -808,6 +812,17 @@ const AdminDashboard = ({ onLogout, adminData }) => {
                                   }`}>
                                   {appointment.status.toUpperCase()}
                                 </span>
+                              </td>
+                              <td>
+                                {appointment.isPaid ? (
+                                  <span className="badge bg-success">
+                                    <i className="fas fa-check me-1"></i>PAID
+                                  </span>
+                                ) : (
+                                  <span className="badge bg-danger">
+                                    <i className="fas fa-times me-1"></i>UNPAID
+                                  </span>
+                                )}
                               </td>
                               <td>
                                 <button

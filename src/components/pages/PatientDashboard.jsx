@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import MedicalRecords from './MedicalRecords';
+import PaymentForm from './PaymentForm';
+import PaymentHistory from './PaymentHistory';
+import './PaymentForm.css';
+import './BookAppointment.css';
 
 const PatientDashboard = ({ onLogout, patientData }) => {
   const { logout } = useAuth();
@@ -17,8 +21,13 @@ const PatientDashboard = ({ onLogout, patientData }) => {
     appointmentTime: '',
     reason: ''
   });
+  const [paymentOption, setPaymentOption] = useState('with-payment');
   const [isHoliday, setIsHoliday] = useState(false);
   const [holidayInfo, setHolidayInfo] = useState(null);
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const [showPaymentHistory, setShowPaymentHistory] = useState(false);
+  const [showAppointmentPayment, setShowAppointmentPayment] = useState(false);
+  const [pendingAppointment, setPendingAppointment] = useState(null);
 
   useEffect(() => {
     if (showAppointmentForm) {
@@ -72,14 +81,26 @@ const PatientDashboard = ({ onLogout, patientData }) => {
       const result = await response.json();
 
       if (response.ok && result.success) {
-        alert('Appointment booked successfully!');
-        setShowAppointmentForm(false);
-        setAppointmentData({
-          doctorName: '',
-          appointmentDate: '',
-          appointmentTime: '',
-          reason: ''
-        });
+        if (paymentOption === 'with-payment') {
+          // Store appointment data and redirect to payment
+          setPendingAppointment({
+            ...appointmentData,
+            appointmentId: result.appointment.id
+          });
+          setShowAppointmentForm(false);
+          setShowAppointmentPayment(true);
+        } else {
+          // Book without payment
+          alert('Appointment booked successfully!');
+          setShowAppointmentForm(false);
+          setAppointmentData({
+            doctorName: '',
+            appointmentDate: '',
+            appointmentTime: '',
+            reason: ''
+          });
+          setPaymentOption('with-payment');
+        }
       } else {
         if (result.isOnLeave) {
           alert(`❌ ${result.message}\n\nPlease select a different date or doctor.`);
@@ -295,6 +316,34 @@ const PatientDashboard = ({ onLogout, patientData }) => {
     );
   }
 
+  if (showPaymentHistory) {
+    return <PaymentHistory onBack={() => setShowPaymentHistory(false)} patientData={patientData} />;
+  }
+
+  if (showAppointmentPayment) {
+    return (
+      <PaymentForm 
+        onBack={() => {
+          setShowAppointmentPayment(false);
+          setAppointmentData({
+            doctorName: '',
+            appointmentDate: '',
+            appointmentTime: '',
+            reason: ''
+          });
+          setPendingAppointment(null);
+          alert('Appointment booked successfully! Payment completed.');
+        }} 
+        patientData={patientData} 
+        appointmentData={pendingAppointment}
+      />
+    );
+  }
+
+  if (showPaymentForm) {
+    return <PaymentForm onBack={() => setShowPaymentForm(false)} patientData={patientData} />;
+  }
+
   if (showMedicalRecords) {
     return <MedicalRecords onBack={() => setShowMedicalRecords(false)} patientData={patientData} />;
   }
@@ -395,6 +444,33 @@ const PatientDashboard = ({ onLogout, patientData }) => {
                   </div>
                 )}
 
+                {/* Payment Option Selection */}
+                <div className="payment-option-selection mb-4">
+                  <label className="form-label fw-semibold">Booking Option *</label>
+                  <div className="row">
+                    <div className="col-md-6 mb-2">
+                      <div 
+                        className={`payment-option-card ${paymentOption === 'with-payment' ? 'active' : ''}`}
+                        onClick={() => setPaymentOption('with-payment')}
+                      >
+                        <i className="fas fa-credit-card me-2"></i>
+                        Book with Payment
+                        <small className="d-block text-muted">Pay now and confirm appointment</small>
+                      </div>
+                    </div>
+                    <div className="col-md-6 mb-2">
+                      <div 
+                        className={`payment-option-card ${paymentOption === 'without-payment' ? 'active' : ''}`}
+                        onClick={() => setPaymentOption('without-payment')}
+                      >
+                        <i className="fas fa-calendar me-2"></i>
+                        Book without Payment
+                        <small className="d-block text-muted">Pay later at clinic</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <form onSubmit={handleAppointmentSubmit}>
                   <div className="mb-3">
                     <label className="form-label fw-semibold">Doctor Name</label>
@@ -411,11 +487,11 @@ const PatientDashboard = ({ onLogout, patientData }) => {
                         required
                       >
                         <option value="">Select Doctor</option>
-                        <option value="Dr. Smith">Dr. Smith</option>
-                        <option value="Dr. Johnson">Dr. Johnson</option>
-                        <option value="Dr. Williams">Dr. Williams</option>
-                        <option value="Dr. Brown">Dr. Brown</option>
-                        <option value="Dr. Davis">Dr. Davis</option>
+                        <option value="Dr. Smith">Dr. Smith - Cardiologist ($200)</option>
+                        <option value="Dr. Johnson">Dr. Johnson - Neurologist ($180)</option>
+                        <option value="Dr. Williams">Dr. Williams - General Physician ($150)</option>
+                        <option value="Dr. Brown">Dr. Brown - Orthopedic ($220)</option>
+                        <option value="Dr. Davis">Dr. Davis - Dermatologist ($190)</option>
                       </select>
                     </div>
                   </div>
@@ -486,7 +562,8 @@ const PatientDashboard = ({ onLogout, patientData }) => {
 
                   <button type="submit" className="btn btn-primary w-100 py-3" disabled={isHoliday}>
                     <i className="fas fa-calendar-plus me-2"></i>
-                    {isHoliday ? 'Booking Closed - Holiday' : 'Book Appointment'}
+                    {isHoliday ? 'Booking Closed - Holiday' : 
+                     paymentOption === 'with-payment' ? 'Book Appointment & Pay' : 'Book Appointment'}
                   </button>
                 </form>
               </div>
@@ -551,9 +628,15 @@ const PatientDashboard = ({ onLogout, patientData }) => {
                   </a>
                 </li>
                 <li className="nav-item mb-2">
-                  <a className="nav-link" href="#">
-                    <i className="fas fa-user-md me-2"></i>
-                    My Doctors
+                  <a className="nav-link" href="#" onClick={() => setShowPaymentForm(true)}>
+                    <i className="fas fa-credit-card me-2"></i>
+                    Pay Doctor Fee
+                  </a>
+                </li>
+                <li className="nav-item mb-2">
+                  <a className="nav-link" href="#" onClick={() => setShowPaymentHistory(true)}>
+                    <i className="fas fa-history me-2"></i>
+                    Payment History
                   </a>
                 </li>
               </ul>
@@ -623,6 +706,26 @@ const PatientDashboard = ({ onLogout, patientData }) => {
                       >
                         <i className="fas fa-cloud-upload-alt me-2"></i>
                         Upload Document
+                      </button>
+                    </div>
+                  </div>
+                  <div className="row">
+                    <div className="col-md-3 mb-3">
+                      <button 
+                        className="btn btn-info w-100"
+                        onClick={() => setShowPaymentForm(true)}
+                      >
+                        <i className="fas fa-credit-card me-2"></i>
+                        Pay Doctor Fee
+                      </button>
+                    </div>
+                    <div className="col-md-3 mb-3">
+                      <button 
+                        className="btn btn-outline-info w-100"
+                        onClick={() => setShowPaymentHistory(true)}
+                      >
+                        <i className="fas fa-history me-2"></i>
+                        Payment History
                       </button>
                     </div>
                   </div>

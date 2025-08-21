@@ -1,0 +1,152 @@
+.payment-form-container {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+.payment-form-card {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  border: none;
+}
+
+.back-btn {
+  background: transparent;
+  border: 2px solid #6c757d;
+  color: #6c757d;
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.back-btn:hover {
+  background: #6c757d;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.payment-summary .card {
+  border: none;
+  border-radius: 15px;
+}
+
+.payment-form-card .form-control {
+  border-radius: 10px;
+  border: 2px solid #e9ecef;
+  padding: 0.75rem 1rem;
+  transition: all 0.3s ease;
+}
+
+.payment-form-card .form-control:focus {
+  border-color: #28a745;
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+.payment-form-card .input-group-text {
+  border-radius: 10px 0 0 10px;
+  border: 2px solid #e9ecef;
+  border-right: none;
+  background: #f8f9fa;
+}
+
+.security-info .alert {
+  border-radius: 10px;
+  border: none;
+}
+
+.payment-methods i {
+  margin: 0 0.5rem;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.payment-methods i:hover {
+  opacity: 1;
+}
+
+.btn-success {
+  border-radius: 15px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+}
+
+.payment-method-selection h5 {
+  color: #495057;
+  font-weight: 600;
+}
+
+.payment-method-card {
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.payment-method-card:hover {
+  border-color: #007bff;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 123, 255, 0.2);
+}
+
+.payment-method-card.active {
+  border-color: #28a745;
+  background: #f8fff9;
+  color: #28a745;
+}
+
+.payment-method-card i {
+  font-size: 1.2rem;
+}
+
+.paypal-container {
+  margin-top: 1rem;
+}
+
+.payment-option-selection h5 {
+  color: #495057;
+  font-weight: 600;
+}
+
+.payment-option-card {
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+  height: 100%;
+}
+
+.payment-option-card:hover {
+  border-color: #007bff;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 123, 255, 0.2);
+}
+
+.payment-option-card.active {
+  border-color: #28a745;
+  background: #f8fff9;
+  color: #28a745;
+}
+
+.payment-option-card i {
+  font-size: 1.2rem;
+}
+
+.payment-option-card small {
+  margin-top: 0.5rem;
+}

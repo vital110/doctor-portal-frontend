@@ -1,9 +1,11 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
+const paypal = require('@paypal/checkout-server-sdk');
+const { client } = require('../config/paypal');
 const path = require('path');
 const fs = require('fs');
-const { Admin, Patient, Appointment, ClinicSetting, Holiday, DoctorLeave, MedicalRecord, AdminLeave, AdminSalary, PatientMedicalDoc } = require('../models');
+const { Admin, Patient, Appointment, ClinicSetting, Holiday, DoctorLeave, MedicalRecord, AdminLeave, AdminSalary, PatientMedicalDoc, Payment } = require('../models');
 const { Op } = require('sequelize');
 const { adminRegistrationSchema, patientRegistrationSchema, loginSchema, appointmentSchema } = require('../validators/authValidators');
 const router = express.Router();
@@ -368,13 +370,37 @@ router.get('/today-appointments', async (req, res) => {
           [Op.between]: [startOfDay, endOfDay]
         }
       },
-      include: [{
-        model: Patient,
-        as: 'patient',
-        attributes: ['fullName', 'email']
-      }],
+      include: [
+        {
+          model: Patient,
+          as: 'patient',
+          attributes: ['fullName', 'email']
+        }
+      ],
       order: [['appointmentTime', 'ASC']]
     });
+
+    // Add payment status
+    if (appointments.length > 0) {
+      const appointmentIds = appointments.map(apt => apt.id);
+      const paidAppointments = await Payment.findAll({
+        where: {
+          appointmentId: {
+            [Op.in]: appointmentIds
+          },
+          status: 'completed'
+        },
+        attributes: ['appointmentId']
+      });
+      
+      const paidAppointmentIds = new Set(paidAppointments.map(p => p.appointmentId));
+      console.log('Paid appointment IDs:', Array.from(paidAppointmentIds));
+      
+      appointments.forEach(appointment => {
+        appointment.dataValues.isPaid = paidAppointmentIds.has(appointment.id);
+        console.log(`Appointment ${appointment.id} isPaid:`, appointment.dataValues.isPaid);
+      });
+    }
 
     res.json({
       success: true,
@@ -1397,6 +1423,125 @@ router.delete('/patient-document/:documentId', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error deleting document',
+      error: error.message
+    });
+  }
+});
+
+// Process payment
+router.post('/process-payment', async (req, res) => {
+  try {
+    const { patientId, appointmentId, doctorName, amount, paymentMethod, cardDetails, paypalOrderId, upiDetails } = req.body;
+
+    let finalTransactionId;
+    let status = 'completed';
+    let payerEmail = null;
+    let payerName = null;
+    let transactionDetails = null;
+    let upiId = null;
+    let phoneNumber = null;
+
+    if (paymentMethod === 'paypal' && paypalOrderId) {
+      try {
+        // Verify PayPal transaction
+        const request = new paypal.orders.OrdersGetRequest(paypalOrderId);
+        const order = await client().execute(request);
+        
+        if (order.result.status === 'COMPLETED') {
+          const captureId = order.result.purchase_units[0].payments.captures[0].id;
+          finalTransactionId = captureId;
+          payerEmail = order.result.payer.email_address;
+          payerName = `${order.result.payer.name.given_name} ${order.result.payer.name.surname}`;
+          transactionDetails = JSON.stringify(order.result);
+          status = 'completed';
+        } else {
+          status = 'failed';
+        }
+      } catch (paypalError) {
+        console.error('PayPal verification error:', paypalError);
+        status = 'failed';
+        finalTransactionId = paypalOrderId;
+      }
+    } else if (paymentMethod === 'upi' && upiDetails) {
+      // Process UPI payment
+      finalTransactionId = 'UPI' + Date.now() + Math.random().toString(36).substr(2, 9);
+      upiId = upiDetails.upiId;
+      phoneNumber = upiDetails.phoneNumber;
+      transactionDetails = JSON.stringify(upiDetails);
+      status = 'completed'; // In real implementation, this would be pending until UPI confirmation
+    } else {
+      // Generate transaction ID for card payments
+      finalTransactionId = 'TXN' + Date.now() + Math.random().toString(36).substr(2, 9);
+    }
+    
+    console.log('Creating payment with appointmentId:', appointmentId);
+    
+    const payment = await Payment.create({
+      patientId,
+      appointmentId,
+      doctorName,
+      amount,
+      paymentMethod,
+      status,
+      transactionId: finalTransactionId,
+      paypalOrderId: paymentMethod === 'paypal' ? paypalOrderId : null,
+      payerEmail,
+      payerName,
+      transactionDetails,
+      upiId,
+      phoneNumber,
+      paymentDate: new Date()
+    });
+    
+    console.log('Payment created:', payment.id, 'for appointment:', payment.appointmentId);
+
+    res.json({
+      success: status === 'completed',
+      message: status === 'completed' 
+        ? `${paymentMethod === 'paypal' ? 'PayPal' : 'Card'} payment processed successfully`
+        : 'Payment verification failed',
+      payment: {
+        id: payment.id,
+        transactionId: payment.transactionId,
+        amount: payment.amount,
+        status: payment.status,
+        paymentMethod: payment.paymentMethod,
+        payerEmail: payment.payerEmail,
+        payerName: payment.payerName
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Payment processing failed',
+      error: error.message
+    });
+  }
+});
+
+// Get patient payment history
+router.get('/patient-payments/:patientId', async (req, res) => {
+  try {
+    const { patientId } = req.params;
+
+    const payments = await Payment.findAll({
+      where: { patientId },
+      include: [{
+        model: Appointment,
+        as: 'appointment',
+        attributes: ['appointmentDate', 'appointmentTime', 'reason']
+      }],
+      order: [['paymentDate', 'DESC']]
+    });
+
+    res.json({
+      success: true,
+      payments: payments
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching payment history',
       error: error.message
     });
   }
